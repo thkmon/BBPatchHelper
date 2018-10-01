@@ -78,6 +78,28 @@ public class StringUtil {
 			}
 		}
 		
+		folderIdx = StringUtil.indexOfIgnoreCase(path, "/gits/");
+		if (folderIdx > -1) {
+			int newIndex = path.indexOf("/", folderIdx + 6);
+			if (newIndex > -1) {
+				int resultIndex = path.indexOf("/", newIndex + 1);
+				if (resultIndex > -1) {
+					return resultIndex;
+				}
+			}
+		}
+		
+		folderIdx = StringUtil.indexOfIgnoreCase(path, "/git/");
+		if (folderIdx > -1) {
+			int newIndex = path.indexOf("/", folderIdx + 5);
+			if (newIndex > -1) {
+				int resultIndex = path.indexOf("/", newIndex + 1);
+				if (resultIndex > -1) {
+					return resultIndex;
+				}
+			}
+		}
+		
 		return -1;
 	}
 	
