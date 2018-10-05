@@ -92,7 +92,7 @@ public class BasicForm extends JFrame {
 //			}
 //		});
 		
-		addComponent(scrollPane);
+		addComponentObj(scrollPane);
 		return obj;
 	}
 	
@@ -103,7 +103,7 @@ public class BasicForm extends JFrame {
 		obj.setBounds(left, top, width, height);
 		obj.setFont(font);
 		
-		addComponent(obj);
+		addComponentObj(obj);
 		return obj;
 	}
 	
@@ -126,7 +126,7 @@ public class BasicForm extends JFrame {
 //			}
 //		});
 		
-		addComponent(obj);
+		addComponentObj(obj);
 		return obj;
 	}
 	
@@ -150,7 +150,7 @@ public class BasicForm extends JFrame {
 //			}
 //		});
 		
-		addComponent(obj);
+		addComponentObj(obj);
 		return obj;
 	}
 	
@@ -173,18 +173,18 @@ public class BasicForm extends JFrame {
 //			}
 //		});
 		
-		addComponent(checkBox);
+		addComponentObj(checkBox);
 		return checkBox;
 	}
 	
 	
-	private void addComponent(Component comp) {
+	private void addComponentObj(Component comp) {
 		container.add(comp);
 		componentList.add(comp);
 	}
 	
 	
-	public Component getComponent(int index) {
+	public Component getComponentObj(int index) {
 		if (componentList == null || componentList.size() == 0) {
 			return null;
 		}
