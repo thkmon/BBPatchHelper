@@ -2,12 +2,16 @@ package com.bb.patch.form;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
@@ -32,8 +36,16 @@ public class PatchForm {
 	}
 	
 	public static JTextArea targetPathList = null;
-	public static JTextField destDirText = null;
+	public static JScrollPane targetPathScrollPane = null;
+	
+	
+	public static JLabel forbiddenFileLabel = null;
 	public static JTextField forbiddenFileText = null;
+	
+	public static JLabel destDirLabel = null;
+	public static JTextField destDirText = null;
+	
+	public static JButton copyButton = null;
 	
 	
 	public PatchForm() {
@@ -43,7 +55,7 @@ public class PatchForm {
 			title = title + "_" + CConst.version;
 		}
 		
-		BasicForm bForm = new BasicForm(CConst.winWidth, CConst.winHeight, title);
+		final BasicForm bForm = new BasicForm(CConst.winWidth, CConst.winHeight, title);
 		
 		bForm.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
@@ -86,6 +98,7 @@ public class PatchForm {
 		// 대상파일 TextArea
 		plusTop(1);
 		targetPathList = bForm.addTextArea(left, top, width, 170);
+		targetPathScrollPane = bForm.addScrollPane(targetPathList, left, top, width, 170);
 		
 		plusTop(6);
 		plusTopLittle(1);
@@ -97,22 +110,22 @@ public class PatchForm {
 		plusTop(1);
 		
 		// 복사금지 패턴
-		bForm.addLabel(left, top, width, 30, "복사금지 패턴");
+		forbiddenFileLabel = bForm.addLabel(left, top, width, 30, "복사금지 패턴");
 		plusTop(1);
 		forbiddenFileText = bForm.addTextInput(left, top, width, 25);
 		forbiddenFileText.setText(CConst.forbiddenFile);
 		
 		plusTop(1);
 		// 결과폴더
-		bForm.addLabel(left, top, width, 30, "결과 폴더");
+		destDirLabel = bForm.addLabel(left, top, width, 30, "결과 폴더");
 		plusTop(1);
 		destDirText = bForm.addTextInput(left, top, width, 25);
 		destDirText.setText(getNotExistingDestDirPath());
 		
 		plusTop(1);
 		plusTopLittle(1);
-		JButton runButton = bForm.addButton(left, top, width, 30, "COPY");
-		runButton.addActionListener(new ActionListener() {
+		copyButton = bForm.addButton(left, top, width, 30, "COPY");
+		copyButton.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent arg0) {
 				MainController mainCtrl = new MainController();
@@ -120,7 +133,64 @@ public class PatchForm {
 			}
 		});
 		
+		bForm.addComponentListener(new ComponentAdapter() {
+			public void componentResized(ComponentEvent evt) {
+				resizeForm(bForm.getWidth(), bForm.getHeight());
+	        }
+		});
+		
 		bForm.open();
+	}
+	
+	
+	private static void resizeForm(int formWidth, int formHeight) {
+		int topToAdd = formHeight - CConst.winHeight; // 520
+		if (topToAdd < 0) {
+			topToAdd = 0;
+		}
+		
+		int newWidth = formWidth - 40;
+		
+		// 대상폴더 인풋박스
+		targetFolderText.setSize(newWidth, targetFolderText.getHeight());
+		
+		// 클래스폴더 인풋박스
+		classFolderText.setSize(newWidth, classFolderText.getHeight());
+		
+		// 대상파일 텍스트영역 2
+		try {
+			int newHeight = 155;
+			newHeight = newHeight + topToAdd;
+			
+			if (newHeight < 155) {
+				newHeight = 155;
+			}
+						
+			// 대상파일 텍스트영역 1
+			targetPathList.setSize(newWidth, newHeight);
+			targetPathScrollPane.setSize(newWidth, newHeight);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		// 자바대신클래스 가져오기
+		javaToClassCheckBox.setBounds(javaToClassCheckBox.getX(), 280 + topToAdd, javaToClassCheckBox.getWidth(), javaToClassCheckBox.getHeight());
+		
+		// 복사금지 라벨
+		forbiddenFileLabel.setBounds(forbiddenFileLabel.getX(), 305 + topToAdd, forbiddenFileLabel.getWidth(), forbiddenFileLabel.getHeight());
+		
+		// 복사금지 인풋박스
+		forbiddenFileText.setBounds(forbiddenFileText.getX(), 330 + topToAdd, newWidth, forbiddenFileText.getHeight());
+		
+		// 결과폴더 라벨
+		destDirLabel.setBounds(destDirLabel.getX(), 355 + topToAdd, destDirLabel.getWidth(), destDirLabel.getHeight());
+		
+		// 결과폴더 인풋박스
+		destDirText.setBounds(destDirText.getX(), 380 + topToAdd, newWidth, destDirText.getHeight());
+		
+		// 카피 버튼
+		copyButton.setBounds(copyButton.getX(), 420 + topToAdd, newWidth, copyButton.getHeight());
 	}
 	
 	

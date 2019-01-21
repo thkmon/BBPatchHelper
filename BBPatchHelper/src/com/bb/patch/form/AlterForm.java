@@ -71,7 +71,7 @@ public class AlterForm {
 		
 		// 첫번째 컴포넌트인 JScrollPane 를 꺼낸다.
 		// textArea 가 JScrollPane 에 담겨있기 때문에 JScrollPane 를 리사이즈 해줘야 한다.
-		textPane = (JScrollPane) aForm.getComponentObj(0);
+		textPane = aForm.addScrollPane(textArea, 10, 10, width - 40, height - 120);
 		
 		okButton = aForm.addButton(10, height - 100, width - 40, 30, "OK");
 		okButton.addActionListener(new ActionListener() {

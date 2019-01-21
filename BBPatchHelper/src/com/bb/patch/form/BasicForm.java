@@ -3,11 +3,7 @@ package com.bb.patch.form;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Cursor;
 import java.awt.Font;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
-import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -22,13 +18,11 @@ import com.bb.patch.common.CConst;
 public class BasicForm extends JFrame {
 	
 	
-	private ArrayList<Component> componentList = null;
 	private Container container = null;
 	private Font font = null;
 	
 	
 	public BasicForm(int width, int height, String title) {
-		componentList = new ArrayList<Component>();
 		container = getContentPane();
 		container.setLayout(null);
 		setSize(width, height);
@@ -70,29 +64,22 @@ public class BasicForm extends JFrame {
 	}
 	
 	
+	public JScrollPane addScrollPane(JTextArea obj, int left, int top, int width, int height) {
+		JScrollPane scrollPane = new JScrollPane(obj);
+		scrollPane.setBackground(Color.white);
+		scrollPane.setBounds(left, top, width, height);
+		
+		addComponentObj(scrollPane);
+		return scrollPane;
+	}
+	
+	
 	public JTextArea addTextArea(int left, int top, int width, int height) {
 
 		JTextArea obj = new JTextArea();
 		obj.setBackground(Color.white);
 		obj.setBounds(left, top, width, height);
 		obj.setFont(font);
-
-		JScrollPane scrollPane = new JScrollPane(obj);
-		scrollPane.setBackground(Color.white);
-		scrollPane.setBounds(left, top, width, height);
-		
-//		obj.addMouseMotionListener(new MouseMotionListener() {
-//			@Override
-//			public void mouseMoved(MouseEvent e) {
-//				setCursor(Cursor.TEXT_CURSOR);
-//			}
-//			
-//			@Override
-//			public void mouseDragged(MouseEvent e) {
-//			}
-//		});
-		
-		addComponentObj(scrollPane);
 		return obj;
 	}
 	
@@ -180,20 +167,5 @@ public class BasicForm extends JFrame {
 	
 	private void addComponentObj(Component comp) {
 		container.add(comp);
-		componentList.add(comp);
 	}
-	
-	
-	public Component getComponentObj(int index) {
-		if (componentList == null || componentList.size() == 0) {
-			return null;
-		}
-		
-		if (index < componentList.size() - 1) {
-			return null;
-		}
-		
-		return componentList.get(index);
-	}
-
 }
