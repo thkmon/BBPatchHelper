@@ -132,8 +132,8 @@ public class MainController {
 	}
 	
 	
-	// AUTO 버튼 클릭시 수행
-	public void autoButtonClicked() {
+	// REVISE 버튼 클릭시 수행
+	public void reviseButtonClicked() {
 		
 		// 대상파일 인풋박스 보정
 		String targetFolderText = PatchForm.targetFolderText.getText();

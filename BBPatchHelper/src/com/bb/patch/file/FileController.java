@@ -396,7 +396,8 @@ public class FileController {
 			}
 			
 			
-			
+			// 클래스파일 인풋박스 보정
+			String classFolderText = StringUtil.parseStirng(PatchForm.classFolderText.getText()).trim();
 			
 			String tmpPath = resultPath;
 			int srcPos = resultPath.indexOf("/src/");
@@ -405,32 +406,31 @@ public class FileController {
 				String FileDirPath = resultPath.substring(0, srcPos);
 				String classFileName = resultPath.substring(lastSlashPos + 1);
 				
-				File tmpObj = null;
+				// 패키지 없음
+				if (packagePath == null || packagePath.length() == 0) {
+					packagePath = "";
+				} else {
+					packagePath = packagePath.trim();
+				}
 				
-				if (packagePath != null && packagePath.length() > 0) {
-					resultPath = FileDirPath + "/classes/" + packagePath + "/" + classFileName;
-					
-					tmpObj = new File(resultPath);
-					if (!tmpObj.exists()) {
-						resultPath = FileDirPath + "/bin/" + packagePath + "/" + classFileName;
-					}
+				// C드라이브부터 입력했을 경우
+				if (classFolderText.indexOf(":") > -1) {
+					resultPath = classFolderText + "/" + packagePath + "/" + classFileName;
 					
 				} else {
-					// 패키지 없음
-					resultPath = FileDirPath + "/classes/" + classFileName;
-					
-					tmpObj = new File(resultPath);
-					if (!tmpObj.exists()) {
-						resultPath = FileDirPath + "/bin/" + classFileName;
-					}
+					resultPath = FileDirPath + "/" + classFolderText + "/" + packagePath + "/" + classFileName;
 				}
+				
+				// 슬래시 중복 없도록 패스 보정
+				resultPath = StringUtil.revisePath(resultPath);
 				
 			} else {
 				printErrLog("잘못된 파일 패스입니다. 청크 /src/ 또는 마지막슬래시(/)를 찾을 수 없습니다. : " + tmpPath);
 				return originPath;
 			}
 			
-			// System.out.println(resultPath);
+			
+			
 			
 			File newClsFile = new File(resultPath);
 			

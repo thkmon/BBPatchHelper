@@ -24,6 +24,8 @@ public class CConst {
 	// targetDir == "C:\\NANUM\\workspaces\\프로젝트명\\폴더명\\";
 	public static String targetDir = getOption("TARGET_DIR", "");
 	
+	public static String classDir = getOption("CLASS_DIR", "");
+	
 	public static boolean bJavaToClass = getOption("JAVA_TO_CLASS", "1").equals("1");
 	
 	public static String forbiddenFile = getOption("FORBIDDEN_FILE", "*.xml, *.conf, *.config, *.properties");
@@ -48,10 +50,10 @@ public class CConst {
 	public static Color buttonTextColor = new Color(0, 0, 0);
 
 	public static int winWidth = 600;
-	public static int winHeight = 500;
+	public static int winHeight = 520;
 	
 	public static int errLogWidth = 600;
-	public static int errLogHeight = 500;
+	public static int errLogHeight = 520;
 	
 	public static Color formBackgroundColor = new Color(230, 230, 230);
 	

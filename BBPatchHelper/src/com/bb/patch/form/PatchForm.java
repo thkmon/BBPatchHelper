@@ -13,13 +13,13 @@ import javax.swing.JTextField;
 
 import com.bb.patch.common.CConst;
 import com.bb.patch.datetime.DatetimeUtil;
-import com.bb.patch.file.DirController;
 import com.bb.patch.main.MainController;
 import com.bb.patch.string.StringUtil;
 
 public class PatchForm {
 	
 	public static JTextField targetFolderText = null;
+	public static JTextField classFolderText = null;
 	public static JCheckBox javaToClassCheckBox = null;
 	
 	private int top = 0;
@@ -58,26 +58,36 @@ public class PatchForm {
 		// 대상폴더
 		bForm.addLabel(left, top, width, 30, "대상 폴더 (비워도 됨)");
 		plusTop(1);
-		targetFolderText = bForm.addTextInput(left, top, 470, 25);
+		targetFolderText = bForm.addTextInput(left, top, 560, 25);
 		targetFolderText.setText(CConst.targetDir);
 		
-		JButton autoButton = bForm.addButton(490, top, 79, 24, "AUTO");
-		autoButton.addActionListener(new ActionListener() {
-			
-			public void actionPerformed(ActionEvent arg0) {
-				MainController mainCtrl = new MainController();
-				mainCtrl.autoButtonClicked();
-			}
-		});
+		plusTop(1);
+		
+		// 클래스폴더
+		bForm.addLabel(left, top, width, 30, "클래스 폴더");
+		plusTop(1);
+		classFolderText = bForm.addTextInput(left, top, 560, 25);
+		classFolderText.setText(CConst.classDir);
 		
 		plusTop(1);
 		
 		// 대상파일
 		bForm.addLabel(left, top, width, 30, "대상 파일");
-		plusTop(1);
-		targetPathList = bForm.addTextArea(left, top, width, 190);
 		
-		plusTop(7);
+		JButton reviseButton = bForm.addButton(80, top + 4, 79, 20, "REVISE");
+		reviseButton.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent arg0) {
+				MainController mainCtrl = new MainController();
+				mainCtrl.reviseButtonClicked();
+			}
+		});
+		
+		// 대상파일 TextArea
+		plusTop(1);
+		targetPathList = bForm.addTextArea(left, top, width, 170);
+		
+		plusTop(6);
 		plusTopLittle(1);
 		plusTopLittle(1);
 	
@@ -85,6 +95,7 @@ public class PatchForm {
 		javaToClassCheckBox.setSelected(CConst.bJavaToClass);
 		
 		plusTop(1);
+		
 		// 복사금지 패턴
 		bForm.addLabel(left, top, width, 30, "복사금지 패턴");
 		plusTop(1);
