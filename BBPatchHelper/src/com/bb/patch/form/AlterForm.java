@@ -9,16 +9,13 @@ import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import com.bb.patch.common.CConst;
+
 public class AlterForm {
 	
 	
 	public static void open(String msg) {
-		open(msg, 500, 200);
-	}
-	
-	
-	public static void open(String msg, int width) {
-		open(msg, width, 200);
+		open(msg, CConst.errLogWidth, CConst.errLogHeight);
 	}
 	
 	

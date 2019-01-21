@@ -165,7 +165,9 @@ public class MainController {
 			return;
 		}
 		
-//		Vector resultPathVector = new Vector();
+		// 경고 메시지 담는다.
+		StringBuffer alertMsgBuffer = new StringBuffer();
+		
 		HashMap mapToCheckDupl = new HashMap();
 		StringBuffer resultPathBuffer = new StringBuffer();
 		
@@ -219,75 +221,29 @@ public class MainController {
 			
 			// 콜론이 없고 트렁크가 있을 경우... svn에서 가져온 changeLog이다.
 			if (oneInput.indexOf(":") < 0) {
-				boolean reviseTrunkLog = false;
 				if (oneInput.startsWith("M /trunk/")) {
-					reviseTrunkLog = true;
+					
+					// svn changeLog에서 가져온 파일경로 보정한다.
+					oneInput = oneInput.substring(8);
 					
 				} else if (oneInput.startsWith("A /trunk/")) {
-					reviseTrunkLog = true;
+					
+					// svn changeLog에서 가져온 파일경로 보정한다.
+					oneInput = oneInput.substring(8);
 					
 				} else if (oneInput.startsWith("R /trunk/")) {
 					// R도 패치로 포함시킨다. 이름변경인듯.
-					reviseTrunkLog = true;
+					
+					// svn changeLog에서 가져온 파일경로 보정한다.
+					oneInput = oneInput.substring(8);
 					
 				} else if (oneInput.startsWith("D /trunk/")) {
-					// 지운건 보정하지 말고 두자.(잘보이게)
-					// => 180525 지운건 날려버리자. 로그에 쓰면 그만이다.
-					AlterForm.open("경로 [" + oneInput + "]는 SVN changeLog상 삭제한 이력(D /trunk/)입니다. 패치할 파일인지 다시 확인하시고 해당 라인을 지워주십시오.");
-					return;
-				}
-				
-				// svn changeLog에서 가져온 파일경로 보정한다. 보정하지 않아도 무방하지만 서비스임.
-				if (reviseTrunkLog) {
-					String dirChunk = null;
-					int iidx = -1;
-					
-					dirChunk = "/webapp/";
-					iidx = oneInput.indexOf(dirChunk);
-					if (iidx > -1 &&
-						oneInput.indexOf("/src/") < 0 && oneInput.indexOf("/classes/") < 0 && oneInput.indexOf("/config/") < 0 &&
-						!oneInput.endsWith(".java") && !oneInput.endsWith(".class")) {
-						
-						// 자바 및 클래스가 아닌 파일만 고치자.
-						oneInput = oneInput.substring(iidx);
-						
-					} else {
-						dirChunk = "/src/";
-						iidx = oneInput.indexOf(dirChunk);
-						if (iidx > -1 &&
-							oneInput.indexOf("/webapp/") < 0 && oneInput.indexOf("/classes/") < 0 && oneInput.indexOf("/config/") < 0 &&
-							oneInput.toLowerCase().endsWith(".java")) {
-							
-							// 자바 파일만 고치자.
-							oneInput = oneInput.substring(iidx);
-							
-						} else {
-							dirChunk = "/classes/";
-							iidx = oneInput.indexOf(dirChunk);
-							if (iidx > -1 &&
-								oneInput.indexOf("/webapp/") < 0 && oneInput.indexOf("/src/") < 0 && oneInput.indexOf("/config/") < 0 &&
-								oneInput.toLowerCase().endsWith(".class")) {
-								
-								// 클래스 파일만 고치자.
-								oneInput = oneInput.substring(iidx);
-							} else {
-								
-								dirChunk = "/config/";
-								iidx = oneInput.indexOf(dirChunk);
-								if (iidx > -1 &&
-									oneInput.indexOf("/webapp/") < 0 && oneInput.indexOf("/src/") < 0 && oneInput.indexOf("/classes/") < 0 &&
-									!oneInput.endsWith(".java") && !oneInput.endsWith(".class")) {
-									
-									// 자바 및 클래스가 아닌 파일만 고치자.
-									oneInput = oneInput.substring(iidx);
-								} else {
-									
-								}
-							}
-						}
+					// 삭제 이력 : 지운건 보정하지 말고 두자.(잘보이게)
+					if (alertMsgBuffer.length() > 0) {
+						alertMsgBuffer.append("\r\n");
 					}
+					alertMsgBuffer.append("경로 [" + oneInput + "]는 SVN changeLog상 삭제한 이력(D /trunk/)입니다. 패치할 파일인지 다시 확인하시고 해당 라인을 지워주십시오.");
 				}
-				
 			}
 			
 			oneInput = oneInput.trim();
@@ -306,6 +262,11 @@ public class MainController {
 		}
 		
 		PatchForm.targetPathList.setText(resultPathBuffer.toString());
+		
+		// 경고 메시지 있을 경우 띄워준다.
+		if (alertMsgBuffer != null && alertMsgBuffer.length() > 0) {
+			AlterForm.open(alertMsgBuffer.toString());
+		}
 	}
 	
 	
