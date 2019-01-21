@@ -233,8 +233,8 @@ public class MainController {
 				} else if (oneInput.startsWith("D /trunk/")) {
 					// 지운건 보정하지 말고 두자.(잘보이게)
 					// => 180525 지운건 날려버리자. 로그에 쓰면 그만이다.
-					printLog("경로 [" + oneInput + "]는 SVN changeLog상 삭제한 이력(D /trunk/)입니다. 패치할 파일인지 다시 확인하십시오.");
-					continue;
+					AlterForm.open("경로 [" + oneInput + "]는 SVN changeLog상 삭제한 이력(D /trunk/)입니다. 패치할 파일인지 다시 확인하시고 해당 라인을 지워주십시오.");
+					return;
 				}
 				
 				// svn changeLog에서 가져온 파일경로 보정한다. 보정하지 않아도 무방하지만 서비스임.
@@ -436,17 +436,11 @@ public class MainController {
 			// 결과 출력
 			printResultPaths(resPathToPrint);
 			
-			
-			StringBuffer msg = new StringBuffer();
-			msg.append("끝"); // : 결과폴더 [" + targetFolderText + "]";
-			
 			if (logBuffer != null && logBuffer.length() > 0) {
-				msg.append("\r\n");
-				msg.append(logBuffer.toString());
-				AlterForm.open(msg.toString(), CConst.errLogWidth, CConst.errLogHeight);
+				AlterForm.open("종료." + "\r\n" + logBuffer.toString(), CConst.errLogWidth, CConst.errLogHeight);
 				
 			} else {
-				AlterForm.open(msg.toString());
+				AlterForm.open("종료. 로그없음.");
 			}
 			
 		} catch (Exception e) {

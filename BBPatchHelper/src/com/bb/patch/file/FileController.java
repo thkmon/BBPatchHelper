@@ -405,18 +405,6 @@ public class FileController {
 				String FileDirPath = resultPath.substring(0, srcPos);
 				String classFileName = resultPath.substring(lastSlashPos + 1);
 				
-//				String targetPathChunk = "/classes/";
-//				File targetDirObj = new File (FileDirPath + "/classes/");
-//				if (!targetDirObj.exists() || !targetDirObj.isDirectory()) {
-//					targetDirObj = new File (FileDirPath + "/bin/");
-//					if (targetDirObj.exists() && targetDirObj.isDirectory()) {
-//						targetPathChunk = "/bin/";
-//					} else {
-//						printErrLog("클래스가 들어있는 폴더를 알 수 없습니다. 해당 폴더 내에 bin 폴더 혹은 classes 폴더가 있는지 확인하세요. : " + FileDirPath);
-//						return originPath;
-//					}
-//				}
-				
 				File tmpObj = null;
 				
 				if (packagePath != null && packagePath.length() > 0) {
