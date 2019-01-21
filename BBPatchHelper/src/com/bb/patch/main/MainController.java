@@ -219,23 +219,19 @@ public class MainController {
 			
 			oneInput = oneInput.trim();
 			
+			boolean bReviseTrunkLog = false;
+			
 			// 콜론이 없고 트렁크가 있을 경우... svn에서 가져온 changeLog이다.
 			if (oneInput.indexOf(":") < 0) {
 				if (oneInput.startsWith("M /trunk/")) {
-					
-					// svn changeLog에서 가져온 파일경로 보정한다.
-					oneInput = oneInput.substring(8);
+					bReviseTrunkLog = true;
 					
 				} else if (oneInput.startsWith("A /trunk/")) {
-					
-					// svn changeLog에서 가져온 파일경로 보정한다.
-					oneInput = oneInput.substring(8);
+					bReviseTrunkLog = true;
 					
 				} else if (oneInput.startsWith("R /trunk/")) {
 					// R도 패치로 포함시킨다. 이름변경인듯.
-					
-					// svn changeLog에서 가져온 파일경로 보정한다.
-					oneInput = oneInput.substring(8);
+					bReviseTrunkLog = true;
 					
 				} else if (oneInput.startsWith("D /trunk/")) {
 					// 삭제 이력 : 지운건 보정하지 말고 두자.(잘보이게)
@@ -243,6 +239,43 @@ public class MainController {
 						alertMsgBuffer.append("\r\n");
 					}
 					alertMsgBuffer.append("경로 [" + oneInput + "]는 SVN changeLog상 삭제한 이력(D /trunk/)입니다. 패치할 파일인지 다시 확인하시고 해당 라인을 지워주십시오.");
+				}
+			}
+			
+			// svn changeLog에서 가져온 파일경로 보정한다.
+			if (bReviseTrunkLog) {
+				int tempIndex = -1;
+				
+				tempIndex = oneInput.indexOf("/src/");
+				if (tempIndex > -1) {
+					oneInput = oneInput.substring(tempIndex);
+				} else {
+					tempIndex = oneInput.indexOf("/webapp/");
+					if (tempIndex > -1) {
+						oneInput = oneInput.substring(tempIndex);
+					} else {
+						tempIndex = oneInput.indexOf("/webapps/");
+						if (tempIndex > -1) {
+							oneInput = oneInput.substring(tempIndex);
+						} else {
+							tempIndex = oneInput.indexOf("/config/");
+							if (tempIndex > -1) {
+								oneInput = oneInput.substring(tempIndex);
+							} else {
+								tempIndex = oneInput.indexOf("/classes/");
+								if (tempIndex > -1) {
+									oneInput = oneInput.substring(tempIndex);
+								} else {
+									tempIndex = oneInput.indexOf("/bin/");
+									if (tempIndex > -1) {
+										oneInput = oneInput.substring(tempIndex);
+									} else {
+										
+									}
+								}
+							}
+						}
+					}
 				}
 			}
 			
