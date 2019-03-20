@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -14,6 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 import com.bb.patch.common.CConst;
 import com.bb.patch.datetime.DatetimeUtil;
@@ -38,6 +41,7 @@ public class PatchForm {
 	public static JTextArea targetPathList = null;
 	public static JScrollPane targetPathScrollPane = null;
 	
+	public static JLabel lineLabel = null;
 	
 	public static JLabel forbiddenFileLabel = null;
 	public static JTextField forbiddenFileText = null;
@@ -95,10 +99,48 @@ public class PatchForm {
 			}
 		});
 		
+		lineLabel = bForm.addLabel(365, top, 200, 30, "");
+		// 우측정렬
+		lineLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		
 		// 대상파일 TextArea
 		plusTop(1);
 		targetPathList = bForm.addTextArea(left, top, width, 170);
 		targetPathScrollPane = bForm.addScrollPane(targetPathList, left, top, width, 170);
+		
+		targetPathList.addKeyListener(new KeyListener() {
+			
+			public void keyPressedCore() {
+				
+				try {
+				// 현재 커서가 위치한 곳이 몇 번째 줄인지 알아내기
+			    int currentLineIndex = targetPathList.getLineOfOffset(targetPathList.getCaretPosition()) + 1;
+			    
+			    // 전체 몇 줄인지 알아내기
+				int totalLineCount = targetPathList.getLineCount();
+				
+				// 라인 현황 표시
+				lineLabel.setText(currentLineIndex + " / " + totalLineCount);
+				
+				} catch (Exception e) {}
+			}
+			
+			@Override
+			public void keyTyped(KeyEvent e) {
+				keyPressedCore();
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				keyPressedCore();
+				
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				keyPressedCore();
+			}
+		});
 		
 		plusTop(6);
 		plusTopLittle(1);
