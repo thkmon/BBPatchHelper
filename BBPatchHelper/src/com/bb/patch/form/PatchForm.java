@@ -101,7 +101,7 @@ public class PatchForm {
 			}
 		});
 		
-		lineLabel = bForm.addLabel(365, top, 200, 30, "");
+		lineLabel = bForm.addLabel(width - 235, top, 200, 30, "");
 		// 우측정렬
 		lineLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		
@@ -233,6 +233,9 @@ public class PatchForm {
 		
 		// 클래스폴더 인풋박스
 		classFolderText.setSize(newWidth, classFolderText.getHeight());
+		
+		// 라인현황 레이블
+		lineLabel.setBounds(formWidth - 235, lineLabel.getY(), lineLabel.getWidth(), lineLabel.getHeight());
 		
 		// 대상파일 텍스트영역 2
 		try {
