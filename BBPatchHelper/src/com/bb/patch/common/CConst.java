@@ -10,7 +10,7 @@ import com.bb.patch.string.StringUtil;
 public class CConst {
 	
 	// 프로그램 버전
-	public static String version = "190320";
+	public static String version = "190325";
 	
 	private static final StringMap optionPropFile = new PropFileController().readPropFile("option.properties");
 	public static String getOption(String keyText, String defaultStr) {
@@ -49,7 +49,7 @@ public class CConst {
 	// public static Color buttonColor = new Color(200, 200, 255);
 	// public static Color buttonTextColor = new Color(0, 0, 0);
 	
-	//	연노란색 (190320)
+	//	연노란색 (190320, 190325)
 	public static Color buttonColor = new Color(255, 255, 200);
 	public static Color buttonTextColor = new Color(0, 0, 0);
 

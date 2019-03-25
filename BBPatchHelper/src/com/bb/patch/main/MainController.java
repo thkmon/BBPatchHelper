@@ -300,7 +300,10 @@ public class MainController {
 		}
 
 		PatchForm.targetPathList.setText(resultPathBuffer.toString());
-
+		
+		// 라인현황 업데이트
+		PatchForm.updateLineCountLabel();
+		
 		// 경고 메시지 있을 경우 띄워준다.
 		if (alertMsgBuffer != null && alertMsgBuffer.length() > 0) {
 			AlterForm.open(alertMsgBuffer.toString());

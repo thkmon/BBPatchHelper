@@ -6,6 +6,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -108,37 +110,51 @@ public class PatchForm {
 		targetPathList = bForm.addTextArea(left, top, width, 170);
 		targetPathScrollPane = bForm.addScrollPane(targetPathList, left, top, width, 170);
 		
-		targetPathList.addKeyListener(new KeyListener() {
+		targetPathList.addMouseListener(new MouseListener() {
 			
-			public void keyPressedCore() {
-				
-				try {
-				// 현재 커서가 위치한 곳이 몇 번째 줄인지 알아내기
-			    int currentLineIndex = targetPathList.getLineOfOffset(targetPathList.getCaretPosition()) + 1;
-			    
-			    // 전체 몇 줄인지 알아내기
-				int totalLineCount = targetPathList.getLineCount();
-				
-				// 라인 현황 표시
-				lineLabel.setText(currentLineIndex + " / " + totalLineCount);
-				
-				} catch (Exception e) {}
+			@Override
+			public void mouseReleased(MouseEvent e) {
 			}
 			
 			@Override
+			public void mousePressed(MouseEvent e) {
+				// 라인현황 업데이트
+				updateLineCountLabel();
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// 라인현황 업데이트
+				updateLineCountLabel();
+				
+			}
+		});
+		
+		targetPathList.addKeyListener(new KeyListener() {
+			
+			@Override
 			public void keyTyped(KeyEvent e) {
-				keyPressedCore();
+				// 라인현황 업데이트
+				updateLineCountLabel();
 			}
 			
 			@Override
 			public void keyReleased(KeyEvent e) {
-				keyPressedCore();
-				
 			}
 			
 			@Override
 			public void keyPressed(KeyEvent e) {
-				keyPressedCore();
+				// 라인현황 업데이트
+				updateLineCountLabel();
 			}
 		});
 		
@@ -182,6 +198,25 @@ public class PatchForm {
 		});
 		
 		bForm.open();
+	}
+	
+	
+	/**
+	 * 라인현황 업데이트
+	 */
+	public static void updateLineCountLabel() {
+		
+		try {
+			// 현재 커서가 위치한 곳이 몇 번째 줄인지 알아내기
+		    int currentLineIndex = targetPathList.getLineOfOffset(targetPathList.getCaretPosition()) + 1;
+		    
+		    // 전체 몇 줄인지 알아내기
+			int totalLineCount = targetPathList.getLineCount();
+			
+			// 라인 현황 표시
+			lineLabel.setText(currentLineIndex + " / " + totalLineCount);
+		
+		} catch (Exception e) {}
 	}
 	
 	
