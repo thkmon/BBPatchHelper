@@ -231,21 +231,21 @@ public class MainController {
 
 			oneInput = oneInput.trim();
 
-			boolean bReviseTrunkLog = false;
+			boolean bSvnChangeLog = false;
 
 			// 콜론이 없고 트렁크가 있을 경우... svn에서 가져온 changeLog이다.
 			if (oneInput.indexOf(":") < 0) {
-				if (oneInput.startsWith("M /trunk/")) {
-					bReviseTrunkLog = true;
+				if (oneInput.startsWith("M /trunk/") || oneInput.startsWith("M /")) {
+					bSvnChangeLog = true;
 
-				} else if (oneInput.startsWith("A /trunk/")) {
-					bReviseTrunkLog = true;
+				} else if (oneInput.startsWith("A /trunk/") || oneInput.startsWith("A /")) {
+					bSvnChangeLog = true;
 
-				} else if (oneInput.startsWith("R /trunk/")) {
+				} else if (oneInput.startsWith("R /trunk/") || oneInput.startsWith("R /")) {
 					// R도 패치로 포함시킨다. 이름변경인듯.
-					bReviseTrunkLog = true;
+					bSvnChangeLog = true;
 
-				} else if (oneInput.startsWith("D /trunk/")) {
+				} else if (oneInput.startsWith("D /trunk/") || oneInput.startsWith("D /")) {
 					// 삭제 이력 : 날려버리자.
 					if (alertMsgBuffer.length() > 0) {
 						alertMsgBuffer.append("\r\n");
@@ -258,7 +258,7 @@ public class MainController {
 			}
 
 			// svn changeLog에서 가져온 파일경로 보정한다.
-			if (bReviseTrunkLog) {
+			if (bSvnChangeLog) {
 				int tempIndex = -1;
 
 				tempIndex = oneInput.indexOf("/src/");
@@ -285,13 +285,21 @@ public class MainController {
 									if (tempIndex > -1) {
 										oneInput = oneInput.substring(tempIndex);
 									} else {
-
-										// 이도저도 아니면 trunk 다음 슬래시에서 끊는다.
+										// 만약 /turnk/가 존재한다면, trunk 다음 슬래시부터 시작하도록 자른다.
 										int trunkIndex = oneInput.indexOf("/trunk/");
-										int slash1Index = oneInput.indexOf("/", trunkIndex + 1);
-										int slash2Index = oneInput.indexOf("/", slash1Index + 1);
-										if (trunkIndex > -1 && slash1Index > -1 && slash2Index > -1) {
-											oneInput = oneInput.substring(slash2Index);
+										if (trunkIndex > -1) {
+											int slash1Index = oneInput.indexOf("/", trunkIndex);
+											int slash2Index = oneInput.indexOf("/", slash1Index + 1);
+											if (slash1Index > -1 && slash2Index > -1) {
+												oneInput = oneInput.substring(slash2Index);
+											}
+										} else {
+											// 이도저도 아니면 두번째 슬래시부터 시작하도록 자른다.
+											int slash1Index = oneInput.indexOf("/");
+											int slash2Index = oneInput.indexOf("/", slash1Index + 1);
+											if (slash1Index > -1 && slash2Index > -1) {
+												oneInput = oneInput.substring(slash2Index);
+											}
 										}
 
 									}
@@ -303,6 +311,11 @@ public class MainController {
 			}
 
 			oneInput = oneInput.trim();
+			
+			if (oneInput.equals("/") || oneInput.equals("\\")) {
+				// 슬래시나 역슬래시만 남았을 경우 제거한다.
+				continue;
+			}
 
 			// 중복제외하고 추가.
 			if (mapToCheckDupl.get(oneInput) == null) {
@@ -406,6 +419,9 @@ public class MainController {
 				}
 			}
 
+			// 진짜 클래스 폴더패스를 찾는다. 인풋박스에 입력한 값으로 폴더 존재하는지 검사해보고, 없으면 .classpath 파일을 읽어내서 찾아낸다.
+			String realClassFolderPath = getRealClassFolderPath();
+			
 			int count = inputList.size();
 			printLog("패치 대상 개수 : " + count);
 
@@ -435,7 +451,7 @@ public class MainController {
 					continue;
 				}
 
-				if (!fileCtrl.copyAndPasteFile(bDirCopyMode, oneInputPath, resPathToPrint)) {
+				if (!fileCtrl.copyAndPasteFile(realClassFolderPath, bDirCopyMode, oneInputPath, resPathToPrint)) {
 					printErrLog("실패! " + oneInputPath);
 				}
 			}
@@ -674,5 +690,124 @@ public class MainController {
 		}
 
 		buff.append(str);
+	}
+	
+	/**
+	 * 진짜 클래스 폴더패스를 찾는다. 인풋박스에 입력한 값으로 폴더 존재하는지 검사해보고, 없으면 .classpath 파일을 읽어내서 찾아낸다.
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public String getRealClassFolderPath() throws Exception {
+		boolean replaceJavaToCls = PatchForm.javaToClassCheckBox.isSelected();
+		
+		// java 대신 class 가져오기 체크한 경우만 클래스 패스 필요하다.
+		if (!replaceJavaToCls) {
+			return "";
+		}
+		
+		// 대상파일 인풋박스 내용
+		String targetFolderText = StringUtil.parseStirng(PatchForm.targetFolderText.getText());
+		String inputClassPath = StringUtil.parseStirng(PatchForm.classFolderText.getText()).trim();
+		
+		// 1. 일단 인풋박스에 입력해둔 클래스 패스가 유효한지 검사한다.
+		if (inputClassPath.indexOf(":") > -1) {
+			// C드라이브부터 입력했을 경우
+			File firstClassDir = new File(inputClassPath);
+			if (firstClassDir.exists() && firstClassDir.isDirectory()) {
+				String resultPath = PathUtil.revisePath(firstClassDir.getAbsolutePath());
+				printLog("% 클래스 폴더 패스 : " + resultPath);
+				return resultPath;
+			}
+		}
+		
+		// 2. 계속해서 인풋박스에 입력해둔 클래스 패스가 유효한지 검사한다. (예 : 대상파일 +/classes)
+		if (targetFolderText.length() > 0) {
+			if (inputClassPath.length() > 0) {
+				// 대상파일 인풋박스 내용
+				String firstClassPath = PathUtil.revisePath(targetFolderText + "/" + inputClassPath);
+				File firstClassDir = new File(firstClassPath);
+				if (firstClassDir.exists() && firstClassDir.isDirectory()) {
+					String resultPath = PathUtil.revisePath(firstClassDir.getAbsolutePath());
+					printLog("%% 클래스 폴더 패스 : " + resultPath);
+					return resultPath;
+				}
+			}
+		}
+		
+		// 3. 인풋박스에 입력해둔 클래스 패스가 유효하지 않으면, .classpath 파일을 찾아 읽어본다.
+		if (targetFolderText.length() > 0) {
+			String infoFilePath = PathUtil.revisePath(targetFolderText + "/" + ".classpath");
+			File infoFileObj = new File(infoFilePath);
+			if (infoFileObj.exists() && infoFileObj.isFile()) {
+				
+				String parsedClassPath = "";
+				
+				ArrayList<String> infoFileContent = null;
+				try {
+					FileController fileCtrl = new FileController(this);
+					infoFileContent = fileCtrl.readFile(infoFileObj);
+					
+					if (infoFileContent != null && infoFileContent.size() > 0) {
+						String oneLine = null;
+						int fileLineCount = infoFileContent.size();
+						for (int i=0; i<fileLineCount; i++) {
+							oneLine = StringUtil.parseStirng(infoFileContent.get(i));
+							
+							// <classpathentry kind="output" path="classes"/>
+							
+							int idx1 = oneLine.indexOf("<");
+							if (idx1 < 0) {
+								continue;
+							}
+							
+							int idx2 = oneLine.indexOf("classpathentry", idx1 + 1);
+							if (idx2 < 0) {
+								continue;
+							}
+							
+							int idx3 = oneLine.indexOf("kind=\"output\"", idx2 + 1);
+							if (idx3 < 0) {
+								continue;
+							}
+							
+							int idx4 = oneLine.indexOf("path=\"", idx3 + 1);
+							if (idx4 < 0) {
+								continue;
+							}
+							
+							int idx5 = oneLine.indexOf("\"", idx4 + 1);
+							if (idx5 < 0) {
+								continue;
+							}
+							
+							int idx6 = oneLine.indexOf("\"", idx5 + 1);
+							if (idx6 < 0) {
+								continue;
+							}
+							
+							parsedClassPath = oneLine.substring(idx5 + 1, idx6);
+							break;
+						}
+					}
+					
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+				if (parsedClassPath != null && parsedClassPath.length() > 0) {
+					// 대상파일 인풋박스 내용
+					String secondClassPath = PathUtil.revisePath(targetFolderText + "/" + parsedClassPath);
+					File secondClassDir = new File(secondClassPath);
+					if (secondClassDir.exists() && secondClassDir.isDirectory()) {
+						String resultPath = PathUtil.revisePath(secondClassDir.getAbsolutePath());
+						printLog("%%% 클래스 폴더 패스 : " + resultPath);
+						return resultPath;
+					}
+				}
+			}
+		}
+		
+		return "";
 	}
 }

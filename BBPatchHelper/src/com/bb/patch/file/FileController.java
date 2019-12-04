@@ -5,9 +5,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import com.bb.patch.file.data.UniqueStringList;
@@ -24,7 +26,7 @@ public class FileController {
 	}
 	
 
-	public boolean copyAndPasteFile(boolean bDirCopyMode, String path, UniqueStringList resultFilePathList) throws Exception {
+	public boolean copyAndPasteFile(String realClassFolderPath, boolean bDirCopyMode, String path, UniqueStringList resultFilePathList) throws Exception {
 		if (path == null || path.trim().length() == 0) {
 			printErrLog("파일 경로가 없습니다.");
 			return false;
@@ -44,7 +46,7 @@ public class FileController {
 			if (!bDirCopyMode) {
 				
 				String newPath = path;
-				newPath = replacePathFindToReplace(newPath);
+				newPath = replacePathFindToReplace(realClassFolderPath, newPath);
 				
 				if (!path.equals(newPath)) {
 					printLog("경로 수정함. 수정된 파일 복제 대상경로 : " + path + " ===> " + newPath);
@@ -204,7 +206,11 @@ public class FileController {
 		return true;
 	}
 	
-	public String replacePathFindToReplace(String originPath) {
+	public String replacePathFindToReplace(String realClassFolderPath, String originPath) {
+		if (originPath == null || originPath.length() == 0) {
+			return "";
+		}
+		
 		String resultPath = "";
 		
 		try {
@@ -218,25 +224,28 @@ public class FileController {
 				if (resultPath.lastIndexOf(".java") > -1) {
 					// 자바일 경우에만 치환
 					
+					// 파일 경로로 패키지 위치를 알아내는 방식은 예외가 존재한다.
+					// 실제로 클래스 파일 내용을 읽어서 패키지를 알아내자.
+					resultPath = getRealClassFilePath(realClassFolderPath, resultPath);
 					
-					// result = result.substring(0, dotJavaPos) + ".class";
+					if (!originPath.equals(resultPath)) {
+						printLog("class 관련 경로 수정함. 수정된 파일 복제 대상경로 : " + originPath + " ===> " + resultPath);
+					}
 					
-					// suite버전 고려
-					// if (result.indexOf("/src/") > -1) {
-					// 	result = result.replaceAll("/src/com/nanum/", "/classes/com/nanum/");
-					// }
-					// 
-					// if (result.indexOf("/src/") > -1) {
-					// 	result = result.replaceAll("/src/.*/com/nanum/", "/classes/com/nanum/");
-					// }
-					// 
-					// if (result.indexOf("/src/") > -1) {
-					// 	result = result.replaceAll("/src/.*/", "/classes/");
-					// }
+				} else if (resultPath.lastIndexOf(".sqlsession.xml") > -1) {
 					
-					// 기존방식은 예외가 너무 많아서 개빡친다.
-					// 실제로 클래스 파일을 읽어서 패키지를 알아내버리자.
-					resultPath = getRealClassFilePath(resultPath);
+					// 스프링 고려 : 마이바티스 sql용 xml 가져오도록 수정.
+					if (resultPath.indexOf("/src/main/java/com/") > -1) {
+						String tempFilePath = resultPath.replace("/src/main/java/com/", "/src/main/webapp/WEB-INF/classes/com/");
+						File file = new File(tempFilePath);
+						if (file.exists()) {
+							resultPath = tempFilePath;
+							
+							if (!originPath.equals(resultPath)) {
+								printLog("MyBatis 관련 경로 수정함. 수정된 파일 복제 대상경로 : " + originPath + " ===> " + resultPath);
+							}
+						}
+					}
 				}
 			}
 			
@@ -245,10 +254,11 @@ public class FileController {
 			e.printStackTrace();
 			return originPath;
 		}
+		
 		return resultPath;
 	}
 	
-	private String getRealClassFilePath(String javaPath) {
+	private String getRealClassFilePath(String realClassFolderPath, String javaPath) {
 		String originPath = javaPath;
 		
 		String resultPath = javaPath;
@@ -397,13 +407,14 @@ public class FileController {
 			
 			
 			// 클래스파일 인풋박스 보정
-			String classFolderText = StringUtil.parseStirng(PatchForm.classFolderText.getText()).trim();
+			// String classFolderText = StringUtil.parseStirng(PatchForm.classFolderText.getText()).trim();
+			String classFolderText = StringUtil.parseStirng(realClassFolderPath).trim();
 			
 			String tmpPath = resultPath;
 			int srcPos = resultPath.indexOf("/src/");
 			int lastSlashPos = resultPath.lastIndexOf("/");
 			if (srcPos > -1 && lastSlashPos > srcPos) {
-				String FileDirPath = resultPath.substring(0, srcPos);
+				// String FileDirPath = resultPath.substring(0, srcPos);
 				String classFileName = resultPath.substring(lastSlashPos + 1);
 				
 				// 패키지 없음
@@ -414,12 +425,14 @@ public class FileController {
 				}
 				
 				// C드라이브부터 입력했을 경우
-				if (classFolderText.indexOf(":") > -1) {
-					resultPath = classFolderText + "/" + packagePath + "/" + classFileName;
-					
-				} else {
-					resultPath = FileDirPath + "/" + classFolderText + "/" + packagePath + "/" + classFileName;
-				}
+//				if (classFolderText.indexOf(":") > -1) {
+//					resultPath = classFolderText + "/" + packagePath + "/" + classFileName;
+//					
+//				} else {
+//					resultPath = FileDirPath + "/" + classFolderText + "/" + packagePath + "/" + classFileName;
+//				}
+				
+				resultPath = classFolderText + "/" + packagePath + "/" + classFileName;
 				
 				// 슬래시 중복 없도록 패스 보정
 				resultPath = StringUtil.revisePath(resultPath);
@@ -697,6 +710,135 @@ public class FileController {
 	public void printLog(String str) {
 		// this.printErrLog(str);
 		mainCtrl.printLog(str);
+	}
+
+	
+	/**
+	 * 파일 읽기
+	 * 
+	 * @param file
+	 * @return
+	 * @throws IOException
+	 * @throws Exception
+	 */
+	public static ArrayList<String> readFile(File file) throws IOException, Exception {
+		if (file == null || !file.exists()) {
+			return null;
+		}
+
+		ArrayList<String> resultList = null;
+
+		FileInputStream fileInputStream = null;
+		InputStreamReader inputStreamReader = null;
+		BufferedReader bufferedReader = null;
+
+		try {
+			fileInputStream = new FileInputStream(file);
+			inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
+			bufferedReader = new BufferedReader(inputStreamReader);
+
+			String oneLine = null;
+			while ((oneLine = bufferedReader.readLine()) != null) {
+				if (resultList == null) {
+					resultList = new ArrayList<String>();
+				}
+
+				resultList.add(oneLine);
+			}
+
+		} catch (IOException e) {
+			throw e;
+
+		} catch (Exception e) {
+			throw e;
+
+		} finally {
+			close(bufferedReader);
+			close(inputStreamReader);
+			close(fileInputStream);
+		}
+
+		return resultList;
+	}
+	
+	
+	private static void close(BufferedWriter bufferedWriter) {
+		try {
+			if (bufferedWriter != null) {
+				bufferedWriter.close();
+			}
+		} catch (Exception e) {
+			// 무시
+
+		} finally {
+			bufferedWriter = null;
+		}
+	}
+
+	private static void close(OutputStreamWriter outputStreamWriter) {
+		try {
+			if (outputStreamWriter != null) {
+				outputStreamWriter.close();
+			}
+		} catch (Exception e) {
+			// 무시
+
+		} finally {
+			outputStreamWriter = null;
+		}
+	}
+
+	private static void close(FileOutputStream fileOutputStream) {
+		try {
+			if (fileOutputStream != null) {
+				fileOutputStream.close();
+			}
+		} catch (Exception e) {
+			// 무시
+
+		} finally {
+			fileOutputStream = null;
+		}
+	}
+
+	private static void close(FileInputStream fileInputStream) {
+		try {
+			if (fileInputStream != null) {
+				fileInputStream.close();
+			}
+		} catch (Exception e) {
+			// 무시
+
+		} finally {
+			fileInputStream = null;
+		}
+	}
+
+	private static void close(InputStreamReader inputStreamReader) {
+		try {
+			if (inputStreamReader != null) {
+				inputStreamReader.close();
+			}
+		} catch (Exception e) {
+			// 무시
+
+		} finally {
+			inputStreamReader = null;
+		}
+	}
+
+	private static void close(BufferedReader bufferedReader) {
+
+		try {
+			if (bufferedReader != null) {
+				bufferedReader.close();
+			}
+		} catch (Exception e) {
+			// 무시
+
+		} finally {
+			bufferedReader = null;
+		}
 	}
 
 }
