@@ -460,10 +460,10 @@ public class MainController {
 			printResultPaths(resPathToPrint);
 
 			if (logBuffer != null && logBuffer.length() > 0) {
-				AlterForm.open("종료." + "\r\n" + logBuffer.toString(), CConst.errLogWidth, CConst.errLogHeight);
+				AlterForm.open("결과." + "\r\n" + logBuffer.toString(), CConst.errLogWidth, CConst.errLogHeight);
 
 			} else {
-				AlterForm.open("종료. 로그없음.");
+				AlterForm.open("결과. 로그없음.");
 			}
 
 		} catch (Exception e) {
