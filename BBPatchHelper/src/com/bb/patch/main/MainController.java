@@ -105,7 +105,25 @@ public class MainController {
 			} else {
 				file = new File(oneInputPath);
 			}
-
+			
+			// 클라이언트 파일을 찾을 수 없을 경우 vue 프레임워크일 수도 있으니 /frontend/src/ 하위에서 찾아본다.
+			if (!file.exists()) {
+				String lowerExt = PathUtil.getLowerExtension(file.getAbsolutePath());
+				// if (lowerExt.equals("htm") || lowerExt.equals("html") || lowerExt.equals("js") || lowerExt.equals("jsp") || lowerExt.equals("css") || lowerExt.equals("vue")) {
+				if (!lowerExt.equals("java") && !lowerExt.equals("class")) {
+					String newPath = file.getAbsolutePath().replace("\\src\\", "\\frontend\\src\\");
+					File newFile = new File(newPath);
+					if (newFile.exists()) {
+						if (!oneInputPath.equals(newPath)) {
+							printLog("vue 관련 경로 수정함. 수정된 파일 복제 대상경로 : " + oneInputPath + " ===> " + newPath);
+						}
+						
+						oneInputPath = newPath;
+						file = newFile;
+					}
+				}
+			}
+			
 			if (!file.exists()) {
 				printErrLog("파일이 존재하지 않으므로 skip합니다. : " + oneInputPath);
 				continue;
@@ -115,7 +133,7 @@ public class MainController {
 				printErrLog("디렉토리이므로 skip합니다. : " + oneInputPath);
 				continue;
 			}
-
+			
 			if (mapToAvoidDupl.get(oneInputPath) != null) {
 				printErrLog("이미 추가한 경로이므로 skip합니다. : " + oneInputPath);
 				continue;

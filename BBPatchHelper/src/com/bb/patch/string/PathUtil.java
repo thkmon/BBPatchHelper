@@ -67,4 +67,23 @@ public class PathUtil {
 		
 		return false;
 	}
+	
+	/**
+	 * 파일 확장자 소문자 형태로 가져오기
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public static String getLowerExtension(String path) {
+		if (path == null || path.length() == 0) {
+			return "";
+		}
+		
+		int lastDotIndex = path.lastIndexOf(".");
+		if (lastDotIndex > -1) {
+			return path.substring(lastDotIndex + 1).toLowerCase();
+		}
+		
+		return "";
+	}
 }
