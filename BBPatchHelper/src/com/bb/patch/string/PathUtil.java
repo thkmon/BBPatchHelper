@@ -86,4 +86,29 @@ public class PathUtil {
 		
 		return "";
 	}
+	
+	
+	/**
+	 * 파일 패스 보정. 역슬래시를 슬래시로 변경한다.
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public static String revisePath(String path) {
+		if (path == null || path.length() == 0) {
+			return "";
+		}
+		
+		// 역슬래시를 슬래시로 변경
+		while (path.indexOf("\\") > -1) {
+			path = path.replace("\\", "/");
+		}
+		
+		// 연속된 슬래시를 슬래시 1개로 변경
+		while (path.indexOf("//") > -1) {
+			path = path.replace("//", "/");
+		}
+		
+		return path.trim();
+	}
 }
