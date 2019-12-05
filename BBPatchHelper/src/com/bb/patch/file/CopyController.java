@@ -176,6 +176,7 @@ public class CopyController {
 	
 	
 	private static boolean copyFileCore(File originFile, File newFile, ArrayList<String> whitePatternList, ArrayList<String> blackPatternList) throws Exception {
+		boolean bCopied = false;
 		
 		FileInputStream inputStream = null;
 		FileOutputStream outputStream = null;
@@ -207,20 +208,21 @@ public class CopyController {
 			}
 			
 			boolean mkdir = makeParentDir(newFile.getAbsolutePath());
-			
-			if (mkdir) {
-				inputStream = new FileInputStream(originFile);         
-				outputStream = new FileOutputStream(newFile);
-				     
-				fcin =  inputStream.getChannel();
-				fcout = outputStream.getChannel();
-				     
-				long size = fcin.size();
-				fcin.transferTo(0, size, fcout);
-				
-				System.out.println("copyFileCore transferTo : " + newFile.getAbsolutePath());
-				return true;
+			if (!mkdir) {
+				return false;
 			}
+			
+			inputStream = new FileInputStream(originFile);
+			outputStream = new FileOutputStream(newFile);
+			
+			fcin =  inputStream.getChannel();
+			fcout = outputStream.getChannel();
+			
+			long size = fcin.size();
+			fcin.transferTo(0, size, fcout);
+			
+			System.out.println("copyFileCore transferTo : " + newFile.getAbsolutePath());
+			bCopied = true;
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -232,7 +234,7 @@ public class CopyController {
 			close(fcout);
 		}
 		
-		return false;
+		return bCopied;
 	}
 	
 	
@@ -274,49 +276,6 @@ public class CopyController {
 		}
 	}
 	
-	
-	/**
-	  * 특정 파일패스의 부모 폴더가 없을 경우 만든다.
-	  * 
-	  * @param filePath
-	  * @return
-	  */
-	private static boolean makeParentDir(String filePath) {
-
-		if (filePath == null || filePath.trim().length() == 0) {
-			System.err.println("makeParentDir : filePath == null || filePath.length() == 0");
-			return false;
-
-		} else {
-			filePath = filePath.trim();
-		}
-
-		if (filePath.indexOf("/") > -1) {
-			filePath = filePath.replace("/", "\\");
-		}
-
-		while (filePath.indexOf("\\\\") > -1) {
-			filePath = filePath.replace("\\\\", "\\");
-		}
-
-		// 필요한 디렉토리 만들기
-		int lastSlashPos = filePath.lastIndexOf("\\");
-
-		if (lastSlashPos > -1) {
-			File d = new File(filePath.substring(0, lastSlashPos));
-			if (!d.exists()) {
-				d.mkdirs();
-			}
-
-		} else {
-			System.err.println("makeParentDir : lastSlashPos not exists");
-			return false;
-		}
-
-		return true;
-	}
-	
-	
 	private static String revisePath(String path) {
 		if (path == null) {
 			return "";
@@ -330,5 +289,52 @@ public class CopyController {
 		}
 		
 		return path;
+	}
+	
+	/**
+	  * 특정 파일패스의 부모 폴더가 없을 경우 만든다.
+	  * 
+	  * @param filePath
+	  * @return
+	  */
+	private static boolean makeParentDir(String filePath) {
+		boolean bResult = false;
+		
+		if (filePath == null || filePath.trim().length() == 0) {
+			System.err.println("makeParentDir : filePath == null || filePath.length() == 0");
+			return false;
+
+		} else {
+			filePath = filePath.trim();
+		}
+
+		// 역슬래시를 슬래시로 모두 변경
+		if (filePath.indexOf("\\") > -1) {
+			filePath = filePath.replace("\\", "/");
+		}
+
+		// 슬래시 2개를 슬래시 1개로 모두 변경
+		while (filePath.indexOf("//") > -1) {
+			filePath = filePath.replace("//", "/");
+		}
+
+		// 필요한 디렉토리 만들기
+		int lastSlashPos = filePath.lastIndexOf("/");
+
+		if (lastSlashPos > -1) {
+			File d = new File(filePath.substring(0, lastSlashPos));
+			if (d.exists()) {
+				// 폴더 존재하면 생성할 필요없다.
+				bResult = true;
+			} else {
+				bResult = d.mkdirs();
+			}
+
+		} else {
+			System.err.println("makeParentDir : lastSlashPos not exists");
+			return false;
+		}
+
+		return bResult;
 	}
 }
