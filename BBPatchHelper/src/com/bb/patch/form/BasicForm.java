@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
+import java.awt.Frame;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -55,12 +56,23 @@ public class BasicForm extends JFrame {
 	
 	
 	public void open() {
-		setVisible(true);
+		// 최소화되어 있을 경우 윈도우 복원
+		if (this.getState() == Frame.ICONIFIED) {
+			this.setState(Frame.NORMAL);
+		}
+		
+		// 윈도우 표시
+		this.setVisible(true);
+		
+		// 윈도우 포커싱
+		if (this.getFocusableWindowState()) {
+			this.requestFocus();
+		}
 	}
 	
 	
 	public void close() {
-		setVisible(false);
+		this.setVisible(false);
 	}
 	
 	
