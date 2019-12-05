@@ -55,6 +55,7 @@ public class BasicForm extends JFrame {
 	}
 	
 	
+	// 191205 창이 최소화 되어있거나 포커스를 잃어버린 경우에도 창을 보여준다.
 	public void open() {
 		// 최소화되어 있을 경우 윈도우 복원
 		if (this.getState() == Frame.ICONIFIED) {
