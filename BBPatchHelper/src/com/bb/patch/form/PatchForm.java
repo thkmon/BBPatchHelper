@@ -48,8 +48,17 @@ public class PatchForm {
 	public static JLabel forbiddenFileLabel = null;
 	public static JTextField forbiddenFileText = null;
 	
+	// 결과폴더 라벨
 	public static JLabel destDirLabel = null;
+	
+	// 결과폴더 인풋박스
 	public static JTextField destDirText = null;
+	
+	// 결과폴더 열기버튼
+	public static JButton destDirButton = null;
+	public static int destDirButtonGap = 40;
+	public static int destDirButtonWidth = 30;
+	public static int destDirButtonHeight = 25;
 	
 	public static JButton copyButton = null;
 	
@@ -174,11 +183,42 @@ public class PatchForm {
 		forbiddenFileText.setText(CConst.forbiddenFile);
 		
 		plusTop(1);
-		// 결과폴더
+		// 결과폴더 라벨
 		destDirLabel = bForm.addLabel(left, top, width, 30, "결과 폴더");
-		plusTop(1);
-		destDirText = bForm.addTextInput(left, top, width, 25);
+		plusTopLittle(1);
+		
+		// 결과폴더 인풋박스
+		destDirText = bForm.addTextInput(left, top, width - destDirButtonGap, 25);
 		destDirText.setText(getNotExistingDestDirPath());
+		
+		// 결과폴더 열기버튼
+		destDirButton = bForm.addButton(left + (width - destDirButtonGap) + 10, top, destDirButtonWidth, destDirButtonHeight, "...");
+		destDirButton.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent arg0) {
+				
+				boolean bDirExisting = false;
+				File destDirObj = new File(destDirText.getText());
+				if (destDirObj.exists()) {
+					bDirExisting = true;
+				} else {
+					bDirExisting = destDirObj.mkdirs();
+				}
+				
+				if (bDirExisting) {
+					try {
+						Runtime rt = Runtime.getRuntime();
+						Process p1 = rt.exec("explorer.exe " + destDirObj.getAbsolutePath());
+						p1.waitFor();
+					} catch (Exception e) {
+						System.err.println("destDirButton 오류 : " + e.getMessage());
+						e.printStackTrace();
+					}
+				} else {
+					System.err.println("destDirButton 알림 : 폴더생성 실패");
+				}
+			}
+		});
 		
 		plusTop(1);
 		plusTopLittle(1);
@@ -267,7 +307,10 @@ public class PatchForm {
 		destDirLabel.setBounds(destDirLabel.getX(), 355 + topToAdd, destDirLabel.getWidth(), destDirLabel.getHeight());
 		
 		// 결과폴더 인풋박스
-		destDirText.setBounds(destDirText.getX(), 380 + topToAdd, newWidth, destDirText.getHeight());
+		destDirText.setBounds(destDirText.getX(), 380 + topToAdd, newWidth - destDirButtonGap, destDirText.getHeight());
+		
+		// 결과폴더 열기버튼
+		destDirButton.setBounds(destDirText.getX() + (newWidth - destDirButtonGap) + 10, 380 + topToAdd, destDirButtonWidth, destDirButtonHeight);
 		
 		// 카피 버튼
 		copyButton.setBounds(copyButton.getX(), 420 + topToAdd, newWidth, copyButton.getHeight());
