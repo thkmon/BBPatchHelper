@@ -190,8 +190,10 @@ public class MainController {
 			oneInput = inputList.get(i);
 
 			// 공백은 대상이 아니다.
-			if (oneInput == null || oneInput.length() == 0) {
+			if (oneInput == null || oneInput.trim().length() == 0) {
 				continue;
+			} else {
+				oneInput = oneInput.trim();
 			}
 
 			// 영어 없으면 대상이 아니다.
@@ -340,6 +342,69 @@ public class MainController {
 			AlterForm.open(alertMsgBuffer.toString());
 		}
 	}
+	
+	// SORT 버튼 클릭시 수행
+	public void sortButtonClicked() {
+		
+		String inputText = PatchForm.targetPathList.getText();
+
+		if (inputText == null || inputText.trim().length() == 0) {
+			return;
+
+		} else {
+			inputText = inputText.trim();
+		}
+
+		// 엔터값으로 split
+		ArrayList<String> inputList = StringUtil.splitMulti(inputText, "\r\n", "\r", "\n", ";");
+
+		if (inputList == null || inputList.size() == 0) {
+			return;
+		}
+
+		ArrayList<String> tempList = new ArrayList<String>();
+
+		String oneInput = null;
+		int count = inputList.size();
+		for (int i = 0; i < count; i++) {
+			oneInput = inputList.get(i);
+
+			// 공백은 대상이 아니다.
+			if (oneInput == null || oneInput.trim().length() == 0) {
+				continue;
+				
+			} else {
+				oneInput = oneInput.trim();
+			}
+			
+			tempList.add(oneInput);
+
+		}
+		
+		// 알파벳 순으로 정렬
+		Collections.sort(tempList);
+
+		StringBuffer resultPathBuffer = new StringBuffer();
+		if (tempList != null && tempList.size() > 0) {
+			int tempCount = tempList.size();
+			for (int i=0; i<tempCount; i++) {
+				String a = tempList.get(i);
+				resultPathBuffer.append(a);
+				resultPathBuffer.append("\r\n");
+			}
+			
+			if (resultPathBuffer.toString().endsWith("\r\n")) {
+				resultPathBuffer.deleteCharAt(resultPathBuffer.length() - 1);
+				resultPathBuffer.deleteCharAt(resultPathBuffer.length() - 1);
+			}
+
+			PatchForm.targetPathList.setText(resultPathBuffer.toString());
+			
+			// 라인현황 업데이트
+			PatchForm.updateLineCountLabel();
+		}
+	}
+	
 
 	public void copyPathFileToCurrentSpace() {
 
@@ -425,7 +490,9 @@ public class MainController {
 			int count = inputList.size();
 			printLog("패치 대상 개수 : " + count);
 
-			UniqueStringList resPathToPrint = new UniqueStringList();
+			// 파일 복사에 성공하면 결과경로를 출력한다.
+			UniqueStringList resultFilePathListToPrint = new UniqueStringList();
+			UniqueStringList resultCorePathListToPrint = new UniqueStringList();
 
 			String oneInputPath = "";
 
@@ -451,13 +518,13 @@ public class MainController {
 					continue;
 				}
 
-				if (!fileCtrl.copyAndPasteFile(realClassFolderPath, bDirCopyMode, oneInputPath, resPathToPrint)) {
+				if (!fileCtrl.copyAndPasteFile(realClassFolderPath, bDirCopyMode, oneInputPath, resultFilePathListToPrint, resultCorePathListToPrint)) {
 					printErrLog("실패! " + oneInputPath);
 				}
 			}
 
-			// 결과 출력
-			printResultPaths(resPathToPrint);
+			// 파일 복사에 성공하면 결과경로를 출력한다.
+			printResultPaths(resultFilePathListToPrint, resultCorePathListToPrint);
 
 			if (logBuffer != null && logBuffer.length() > 0) {
 				AlterForm.open("결과." + "\r\n" + logBuffer.toString(), CConst.errLogWidth, CConst.errLogHeight);
@@ -471,17 +538,45 @@ public class MainController {
 		}
 	}
 
-	public void printResultPaths(UniqueStringList resPathToPrint) {
-		if (resPathToPrint != null && resPathToPrint.size() > 0) {
+	/**
+	 * 파일 복사에 성공하면 결과경로를 출력한다.
+	 * 
+	 * @param resultFilePathList
+	 * @param resultCorePathList
+	 */
+	public void printResultPaths(UniqueStringList resultFilePathListToPrint, UniqueStringList resultCorePathListToPrint) {
+		int pathCount = 0;
+		
+		// 절대경로 출력
+		if (resultFilePathListToPrint != null && resultFilePathListToPrint.size() > 0) {
 			printLog("==================================================");
-			int resPathCount = resPathToPrint.size();
-			printLog("총 파일 개수 : " + resPathCount + "개");
+			pathCount = resultFilePathListToPrint.size();
+			printLog("총 파일 개수 : " + pathCount + "개");
 
 			// 스트링 정렬
-			Collections.sort(resPathToPrint);
+			Collections.sort(resultFilePathListToPrint);
 
-			for (int i = 0; i < resPathCount; i++) {
-				printLog(resPathToPrint.get(i));
+			for (int i = 0; i < pathCount; i++) {
+				printLog(resultFilePathListToPrint.get(i));
+			}
+			printLog("==================================================");
+		}
+		
+		// 상대경로 출력
+		if (resultCorePathListToPrint != null && resultCorePathListToPrint.size() > 0) {
+			printLog("==================================================");
+			int coreCount = resultCorePathListToPrint.size();
+			
+			// 둘의 카운트가 같은게 정상이다. 혹시 모르니 다를 경우 개수를 출력한다.
+			if (pathCount != coreCount) {
+				printLog("총 파일 개수 : " + coreCount + "개");
+			}
+
+			// 스트링 정렬
+			Collections.sort(resultCorePathListToPrint);
+
+			for (int i = 0; i < coreCount; i++) {
+				printLog(resultCorePathListToPrint.get(i));
 			}
 			printLog("==================================================");
 		}

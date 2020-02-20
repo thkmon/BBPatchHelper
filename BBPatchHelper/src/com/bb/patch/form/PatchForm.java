@@ -101,12 +101,23 @@ public class PatchForm {
 		// 대상파일
 		bForm.addLabel(left, top, width, 30, "대상 파일");
 		
+		// 보정버튼(REVISE)
 		JButton reviseButton = bForm.addButton(80, top + 4, 79, 20, "REVISE");
 		reviseButton.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent arg0) {
 				MainController mainCtrl = new MainController();
 				mainCtrl.reviseButtonClicked();
+			}
+		});
+		
+		// 정렬버튼(SORT)
+		JButton sortButton = bForm.addButton(165, top + 4, 70, 20, "SORT");
+		sortButton.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent arg0) {
+				MainController mainCtrl = new MainController();
+				mainCtrl.sortButtonClicked();
 			}
 		});
 		

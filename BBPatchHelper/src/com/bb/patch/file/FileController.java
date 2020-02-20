@@ -26,7 +26,7 @@ public class FileController {
 	}
 	
 
-	public boolean copyAndPasteFile(String realClassFolderPath, boolean bDirCopyMode, String path, UniqueStringList resultFilePathList) throws Exception {
+	public boolean copyAndPasteFile(String realClassFolderPath, boolean bDirCopyMode, String path, UniqueStringList resultFilePathListToPrint, UniqueStringList resultCorePathListToPrint) throws Exception {
 		if (path == null || path.trim().length() == 0) {
 			printErrLog("파일 경로가 없습니다.");
 			return false;
@@ -86,8 +86,10 @@ public class FileController {
 			}
 			String currentDirPath = currentDir.getAbsolutePath().replace("\\", "/");
 			String resultPath = currentDirPath + "/" + endPath;
-			
 			resultPath = StringUtil.makeToSlashPath(resultPath);
+
+			String corePath1 = "/" + endPath;
+			corePath1 = StringUtil.makeToSlashPath(corePath1);
 			
 			printLog("수정시간 : " + getFileModifyDateTime(originFile));
 			printLog("파일 복제 결과경로 : " + resultPath);
@@ -168,10 +170,14 @@ public class FileController {
 									String resultPath2 = currentDirPath + "/" + endPath2;
 									resultPath2 = StringUtil.makeToSlashPath(resultPath2);
 									
+									String corePath2 = "/" + endPath2;
+									corePath2 = StringUtil.makeToSlashPath(corePath2);
+									
 									boolean innerCopySuccess = copyFile(innerClassFile.getAbsolutePath(), resultPath2);
 									if (innerCopySuccess) {
-										resultFilePathList.add(resultPath2);
-										// StringUtil.addToStringListNotDupl(resultFilePathList, resultPath2);								
+										resultFilePathListToPrint.add(resultPath2);
+										resultCorePathListToPrint.add(corePath2);
+										
 									} else {
 										printErrLog("복사 실패 : " + resultPath2);
 									}
@@ -185,8 +191,8 @@ public class FileController {
 				
 				// 유효한 파일패스만 넣는다. 나중에 출력해주기 위함.
 				if (copySuccess) {
-					resultFilePathList.add(resultPath);
-					// StringUtil.addToStringListNotDupl(resultFilePathList, resultPath);
+					resultFilePathListToPrint.add(resultPath);
+					resultCorePathListToPrint.add(corePath1);
 				} else {
 					printErrLog("복사 실패 : " + resultPath.trim());
 				}
