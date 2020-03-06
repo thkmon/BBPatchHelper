@@ -415,7 +415,7 @@ public class FileController {
 			// 클래스파일 인풋박스 보정
 			String classFolderText = StringUtil.parseStirng(realClassFolderPath).trim();
 			
-			// 20200306 공통 클래스 패스가 없을 경우, 다시 말해 [대상 폴더 (비워도 됨)] 인풋박스가 실제 비워져 있을 경우, 개별 java 파일마다 각각의 class 패스를 찾아온다.
+			// 200306 공통 클래스 패스가 없을 경우, 다시 말해 [대상 폴더 (비워도 됨)] 인풋박스가 실제 비워져 있을 경우, 개별 java 파일마다 각각의 class 패스를 찾아온다.
 			if (classFolderText.length() == 0) {
 				if (originPath != null && originPath.indexOf(":") > -1) {
 					int slashIdx = StringUtil.getIndexOfWorkspaceFolderSlash(originPath);
