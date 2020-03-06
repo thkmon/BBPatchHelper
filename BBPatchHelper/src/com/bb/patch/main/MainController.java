@@ -830,75 +830,89 @@ public class MainController {
 			}
 		}
 		
+		return getRealClassFolderPathByDotClasspathFile(targetFolderText);
+	}
+	
+	
+	/**
+	 * targetFolderText 폴더 내의 .classpath 파일을 읽어내서 클래스 폴더 패스를 찾아낸다.
+	 * 
+	 * @param targetFolderText
+	 * @return
+	 * @throws Exception
+	 */
+	public String getRealClassFolderPathByDotClasspathFile(String targetFolderText) throws Exception {
+		if (targetFolderText == null || targetFolderText.length() == 0) {
+			return "";
+		}
+		
 		// 3. 인풋박스에 입력해둔 클래스 패스가 유효하지 않으면, .classpath 파일을 찾아 읽어본다.
-		if (targetFolderText.length() > 0) {
-			String infoFilePath = PathUtil.revisePath(targetFolderText + "/" + ".classpath");
-			File infoFileObj = new File(infoFilePath);
-			if (infoFileObj.exists() && infoFileObj.isFile()) {
+		String infoFilePath = PathUtil.revisePath(targetFolderText + "/" + ".classpath");
+		File infoFileObj = new File(infoFilePath);
+		if (infoFileObj.exists() && infoFileObj.isFile()) {
+			
+			String parsedClassPath = "";
+			
+			ArrayList<String> infoFileContent = null;
+			try {
+				FileController fileCtrl = new FileController(this);
+				infoFileContent = fileCtrl.readFile(infoFileObj);
 				
-				String parsedClassPath = "";
-				
-				ArrayList<String> infoFileContent = null;
-				try {
-					FileController fileCtrl = new FileController(this);
-					infoFileContent = fileCtrl.readFile(infoFileObj);
-					
-					if (infoFileContent != null && infoFileContent.size() > 0) {
-						String oneLine = null;
-						int fileLineCount = infoFileContent.size();
-						for (int i=0; i<fileLineCount; i++) {
-							oneLine = StringUtil.parseStirng(infoFileContent.get(i));
-							
-							// <classpathentry kind="output" path="classes"/>
-							
-							int idx1 = oneLine.indexOf("<");
-							if (idx1 < 0) {
-								continue;
-							}
-							
-							int idx2 = oneLine.indexOf("classpathentry", idx1 + 1);
-							if (idx2 < 0) {
-								continue;
-							}
-							
-							int idx3 = oneLine.indexOf("kind=\"output\"", idx2 + 1);
-							if (idx3 < 0) {
-								continue;
-							}
-							
-							int idx4 = oneLine.indexOf("path=\"", idx3 + 1);
-							if (idx4 < 0) {
-								continue;
-							}
-							
-							int idx5 = oneLine.indexOf("\"", idx4 + 1);
-							if (idx5 < 0) {
-								continue;
-							}
-							
-							int idx6 = oneLine.indexOf("\"", idx5 + 1);
-							if (idx6 < 0) {
-								continue;
-							}
-							
-							parsedClassPath = oneLine.substring(idx5 + 1, idx6);
-							break;
+				if (infoFileContent != null && infoFileContent.size() > 0) {
+					String oneLine = null;
+					int fileLineCount = infoFileContent.size();
+					for (int i=0; i<fileLineCount; i++) {
+						oneLine = StringUtil.parseStirng(infoFileContent.get(i));
+						
+						// <classpathentry kind="output" path="classes"/>
+						
+						int idx1 = oneLine.indexOf("<");
+						if (idx1 < 0) {
+							continue;
 						}
+						
+						int idx2 = oneLine.indexOf("classpathentry", idx1 + 1);
+						if (idx2 < 0) {
+							continue;
+						}
+						
+						int idx3 = oneLine.indexOf("kind=\"output\"", idx2 + 1);
+						if (idx3 < 0) {
+							continue;
+						}
+						
+						int idx4 = oneLine.indexOf("path=\"", idx3 + 1);
+						if (idx4 < 0) {
+							continue;
+						}
+						
+						int idx5 = oneLine.indexOf("\"", idx4 + 1);
+						if (idx5 < 0) {
+							continue;
+						}
+						
+						int idx6 = oneLine.indexOf("\"", idx5 + 1);
+						if (idx6 < 0) {
+							continue;
+						}
+						
+						parsedClassPath = oneLine.substring(idx5 + 1, idx6);
+						break;
 					}
-					
-				} catch (Exception e) {
-					e.printStackTrace();
 				}
 				
-				if (parsedClassPath != null && parsedClassPath.length() > 0) {
-					// 대상파일 인풋박스 내용
-					String secondClassPath = PathUtil.revisePath(targetFolderText + "/" + parsedClassPath);
-					File secondClassDir = new File(secondClassPath);
-					if (secondClassDir.exists() && secondClassDir.isDirectory()) {
-						String resultPath = PathUtil.revisePath(secondClassDir.getAbsolutePath());
-						printLog("%%% 클래스 폴더 패스 : " + resultPath);
-						return resultPath;
-					}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			if (parsedClassPath != null && parsedClassPath.length() > 0) {
+				// 대상파일 인풋박스 내용
+				String secondClassPath = PathUtil.revisePath(targetFolderText + "/" + parsedClassPath);
+				File secondClassDir = new File(secondClassPath);
+				if (secondClassDir.exists() && secondClassDir.isDirectory()) {
+					String resultPath = PathUtil.revisePath(secondClassDir.getAbsolutePath());
+					printLog("%%% 클래스 폴더 패스 : " + resultPath);
+					return resultPath;
 				}
 			}
 		}
