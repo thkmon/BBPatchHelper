@@ -453,16 +453,23 @@ public class MainController {
 			
 			// 대상 파일에 *을 입력하면 대상 폴더 내부의 모든 파일을 가져오도록 수정
 			boolean bDirCopyMode = false;
+			
+			// 대상 파일이 *이면 대상 폴더값은 무조건 존재해야 한다.
 			if (inputText != null && inputText.equals("*")) {
 				if (targetFolderText == null || targetFolderText.length() == 0) {
 					AlterForm.open("대상 폴더를 입력해주세요.");
 					return;
 				}
-				
+			}
+			
+			// 대상 폴더값이 있을 경우 유효한지 검사
+			if (targetFolderText != null && targetFolderText.length() > 0) {
 				File dirObj = new File(targetFolderText);
 				if (dirObj.exists() && dirObj.isDirectory()) {
-					// 입력값이 없으나 폴더가 제대로 입력된 경우 폴더 복사 모드로 인지
-					bDirCopyMode = true;
+					// 대상 파일이 *이고 폴더가 제대로 입력된 경우 폴더 복사 모드로 인지
+					if (inputText != null && inputText.equals("*")) {
+						bDirCopyMode = true;
+					}
 
 				} else {
 					AlterForm.open("폴더가 아니거나 존재하지 않는 경로입니다. [" + targetFolderText + "]");
