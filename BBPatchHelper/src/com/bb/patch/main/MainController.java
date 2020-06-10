@@ -441,21 +441,31 @@ public class MainController {
 
 			String inputText = PatchForm.targetPathList.getText();
 
-			boolean bDirCopyMode = false;
-			if (inputText == null || inputText.trim().length() == 0) {
+			if (inputText == null || inputText.length() == 0) {
 				if (targetFolderText != null && targetFolderText.length() > 0) {
-					File dirObj = new File(targetFolderText);
-					if (dirObj.exists() && dirObj.isDirectory()) {
-						// 입력값이 없으나 폴더가 제대로 입력된 경우 폴더 복사 모드로 인지
-						bDirCopyMode = true;
-
-					} else {
-						AlterForm.open("폴더가 아니거나 존재하지 않는 경로입니다. [" + targetFolderText + "]");
-						return;
-					}
+					AlterForm.open("대상 파일을 입력해주세요. 대상 폴더 내부의 모든 파일을 가져오려면 *을 입력해주세요.");
+					return;
+				} else {
+					AlterForm.open("대상 파일을 입력해주세요.");
+					return;
+				}
+			}
+			
+			// 대상 파일에 *을 입력하면 대상 폴더 내부의 모든 파일을 가져오도록 수정
+			boolean bDirCopyMode = false;
+			if (inputText != null && inputText.equals("*")) {
+				if (targetFolderText == null || targetFolderText.length() == 0) {
+					AlterForm.open("대상 폴더를 입력해주세요.");
+					return;
+				}
+				
+				File dirObj = new File(targetFolderText);
+				if (dirObj.exists() && dirObj.isDirectory()) {
+					// 입력값이 없으나 폴더가 제대로 입력된 경우 폴더 복사 모드로 인지
+					bDirCopyMode = true;
 
 				} else {
-					AlterForm.open("입력값이 없습니다.");
+					AlterForm.open("폴더가 아니거나 존재하지 않는 경로입니다. [" + targetFolderText + "]");
 					return;
 				}
 			}
