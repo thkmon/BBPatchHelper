@@ -106,24 +106,6 @@ public class MainController {
 				file = new File(oneInputPath);
 			}
 			
-			// 클라이언트 파일을 찾을 수 없을 경우 vue 프레임워크일 수도 있으니 /frontend/src/ 하위에서 찾아본다.
-			if (!file.exists()) {
-				String lowerExt = PathUtil.getLowerExtension(file.getAbsolutePath());
-				// if (lowerExt.equals("htm") || lowerExt.equals("html") || lowerExt.equals("js") || lowerExt.equals("jsp") || lowerExt.equals("css") || lowerExt.equals("vue")) {
-				if (!lowerExt.equals("java") && !lowerExt.equals("class")) {
-					String newPath = file.getAbsolutePath().replace("\\src\\", "\\frontend\\src\\");
-					File newFile = new File(newPath);
-					if (newFile.exists()) {
-						if (!oneInputPath.equals(newPath)) {
-							printLog("vue 관련 경로 수정함. 수정된 파일 복제 대상경로 : " + oneInputPath + " ===> " + newPath);
-						}
-						
-						oneInputPath = newPath;
-						file = newFile;
-					}
-				}
-			}
-			
 			if (!file.exists()) {
 				printErrLog("파일이 존재하지 않으므로 skip합니다. : " + oneInputPath);
 				continue;
@@ -263,47 +245,53 @@ public class MainController {
 			if (bSvnChangeLog) {
 				int tempIndex = -1;
 
-				tempIndex = oneInput.indexOf("/src/");
+				// vue 프레임워크는 /frontend/src/ 에서 자른다.
+				tempIndex = oneInput.indexOf("/frontend/src/");
 				if (tempIndex > -1) {
 					oneInput = oneInput.substring(tempIndex);
 				} else {
-					tempIndex = oneInput.indexOf("/webapp/");
+					tempIndex = oneInput.indexOf("/src/");
 					if (tempIndex > -1) {
 						oneInput = oneInput.substring(tempIndex);
 					} else {
-						tempIndex = oneInput.indexOf("/webapps/");
+						tempIndex = oneInput.indexOf("/webapp/");
 						if (tempIndex > -1) {
 							oneInput = oneInput.substring(tempIndex);
 						} else {
-							tempIndex = oneInput.indexOf("/config/");
+							tempIndex = oneInput.indexOf("/webapps/");
 							if (tempIndex > -1) {
 								oneInput = oneInput.substring(tempIndex);
 							} else {
-								tempIndex = oneInput.indexOf("/classes/");
+								tempIndex = oneInput.indexOf("/config/");
 								if (tempIndex > -1) {
 									oneInput = oneInput.substring(tempIndex);
 								} else {
-									tempIndex = oneInput.indexOf("/bin/");
+									tempIndex = oneInput.indexOf("/classes/");
 									if (tempIndex > -1) {
 										oneInput = oneInput.substring(tempIndex);
 									} else {
-										// 만약 /turnk/가 존재한다면, trunk 다음 슬래시부터 시작하도록 자른다.
-										int trunkIndex = oneInput.indexOf("/trunk/");
-										if (trunkIndex > -1) {
-											int slash1Index = oneInput.indexOf("/", trunkIndex);
-											int slash2Index = oneInput.indexOf("/", slash1Index + 1);
-											if (slash1Index > -1 && slash2Index > -1) {
-												oneInput = oneInput.substring(slash2Index);
-											}
+										tempIndex = oneInput.indexOf("/bin/");
+										if (tempIndex > -1) {
+											oneInput = oneInput.substring(tempIndex);
 										} else {
-											// 이도저도 아니면 두번째 슬래시부터 시작하도록 자른다.
-											int slash1Index = oneInput.indexOf("/");
-											int slash2Index = oneInput.indexOf("/", slash1Index + 1);
-											if (slash1Index > -1 && slash2Index > -1) {
-												oneInput = oneInput.substring(slash2Index);
+											// 만약 /turnk/가 존재한다면, trunk 다음 슬래시부터 시작하도록 자른다.
+											int trunkIndex = oneInput.indexOf("/trunk/");
+											if (trunkIndex > -1) {
+												int slash1Index = oneInput.indexOf("/", trunkIndex);
+												int slash2Index = oneInput.indexOf("/", slash1Index + 1);
+												if (slash1Index > -1 && slash2Index > -1) {
+													oneInput = oneInput.substring(slash2Index);
+												}
+											} else {
+												// 이도저도 아니면 두번째 슬래시부터 시작하도록 자른다.
+												int slash1Index = oneInput.indexOf("/");
+												int slash2Index = oneInput.indexOf("/", slash1Index + 1);
+												if (slash1Index > -1 && slash2Index > -1) {
+													oneInput = oneInput.substring(slash2Index);
+												}
 											}
-										}
 
+										}
 									}
 								}
 							}
