@@ -244,7 +244,12 @@ public class MainController {
 			// svn changeLog에서 가져온 파일경로 보정한다.
 			if (bSvnChangeLog) {
 				int tempIndex = -1;
-
+				
+				// vue 프레임워크는 /frontend/src/ 에서 자른다.
+				if (tempIndex < 0) {
+					tempIndex = oneInput.indexOf("/frontend/src/");
+				}
+				
 				if (tempIndex < 0) {
 					tempIndex = oneInput.indexOf("/src/");
 				}
