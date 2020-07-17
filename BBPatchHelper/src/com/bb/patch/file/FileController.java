@@ -238,11 +238,27 @@ public class FileController {
 						printLog("class 관련 경로 수정함. 수정된 파일 복제 대상경로 : " + originPath + " ===> " + resultPath);
 					}
 					
-				} else if (resultPath.lastIndexOf(".sqlsession.xml") > -1) {
+				}
+//				else if (resultPath.lastIndexOf(".sqlsession.xml") > -1) {
+//					
+//					// 스프링 고려 : 마이바티스 sql용 xml 가져오도록 수정.
+//					if (resultPath.indexOf("/src/main/java/com/") > -1) {
+//						String tempFilePath = resultPath.replace("/src/main/java/com/", "/src/main/webapp/WEB-INF/classes/com/");
+//						File file = new File(tempFilePath);
+//						if (file.exists()) {
+//							resultPath = tempFilePath;
+//							
+//							if (!originPath.equals(resultPath)) {
+//								printLog("MyBatis 관련 경로 수정함. 수정된 파일 복제 대상경로 : " + originPath + " ===> " + resultPath);
+//							}
+//						}
+//					}
+//				}
+				else if (resultPath.toLowerCase().endsWith(".xml")) {
 					
 					// 스프링 고려 : 마이바티스 sql용 xml 가져오도록 수정.
-					if (resultPath.indexOf("/src/main/java/com/") > -1) {
-						String tempFilePath = resultPath.replace("/src/main/java/com/", "/src/main/webapp/WEB-INF/classes/com/");
+					if (resultPath.indexOf("/com/") > -1) {
+						String tempFilePath = realClassFolderPath + resultPath.substring(resultPath.indexOf("/com/"));
 						File file = new File(tempFilePath);
 						if (file.exists()) {
 							resultPath = tempFilePath;
