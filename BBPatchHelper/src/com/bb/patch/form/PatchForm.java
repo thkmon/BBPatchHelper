@@ -30,6 +30,7 @@ public class PatchForm {
 	public static JTextField targetFolderText = null;
 	public static JTextField classFolderText = null;
 	public static JCheckBox javaToClassCheckBox = null;
+	public static JCheckBox getWebappDirOnlyCheckBox = null;
 	
 	private int top = 0;
 	
@@ -48,13 +49,13 @@ public class PatchForm {
 	public static JLabel forbiddenFileLabel = null;
 	public static JTextField forbiddenFileText = null;
 	
-	// 결과폴더 라벨
+	// 결과 폴더 라벨
 	public static JLabel destDirLabel = null;
 	
-	// 결과폴더 인풋박스
+	// 결과 폴더 인풋박스
 	public static JTextField destDirText = null;
 	
-	// 결과폴더 열기버튼
+	// 결과 폴더 열기버튼
 	public static JButton destDirButton = null;
 	public static int destDirButtonGap = 40;
 	public static int destDirButtonWidth = 30;
@@ -182,8 +183,15 @@ public class PatchForm {
 		plusTopLittle(1);
 		plusTopLittle(1);
 	
+		// .java 대신 .class 가져오기
 		javaToClassCheckBox = bForm.addCheckBox(left, top, width, 30, ".java 대신 .class 가져오기");
 		javaToClassCheckBox.setSelected(CConst.bJavaToClass);
+		
+		plusTop(1);
+		
+		// webapp 경로 포함된 경우만 가져오기
+		getWebappDirOnlyCheckBox  = bForm.addCheckBox(left, top, width, 30, "webapp 경로 포함된 경우만 가져오기");
+		getWebappDirOnlyCheckBox.setSelected(CConst.bGetWebappDirOnly);
 		
 		plusTop(1);
 		
@@ -194,15 +202,15 @@ public class PatchForm {
 		forbiddenFileText.setText(CConst.forbiddenFile);
 		
 		plusTop(1);
-		// 결과폴더 라벨
+		// 결과 폴더 라벨
 		destDirLabel = bForm.addLabel(left, top, width, 30, "결과 폴더");
 		plusTopLittle(1);
 		
-		// 결과폴더 인풋박스
+		// 결과 폴더 인풋박스
 		destDirText = bForm.addTextInput(left, top, width - destDirButtonGap, 25);
 		destDirText.setText(getNotExistingDestDirPath());
 		
-		// 결과폴더 열기버튼
+		// 결과 폴더 열기버튼
 		destDirButton = bForm.addButton(left + (width - destDirButtonGap) + 10, top, destDirButtonWidth, destDirButtonHeight, "...");
 		destDirButton.addActionListener(new ActionListener() {
 			
@@ -306,25 +314,35 @@ public class PatchForm {
 		}
 		
 		// 자바대신클래스 가져오기
-		javaToClassCheckBox.setBounds(javaToClassCheckBox.getX(), 280 + topToAdd, javaToClassCheckBox.getWidth(), javaToClassCheckBox.getHeight());
+		topToAdd += 280;
+		javaToClassCheckBox.setBounds(javaToClassCheckBox.getX(), topToAdd, javaToClassCheckBox.getWidth(), javaToClassCheckBox.getHeight());
+		
+		// webapp 경로 포함된 경우만 가져오기
+		topToAdd += 25;
+		getWebappDirOnlyCheckBox.setBounds(getWebappDirOnlyCheckBox.getX(), topToAdd, getWebappDirOnlyCheckBox.getWidth(), getWebappDirOnlyCheckBox.getHeight());
 		
 		// 복사금지 라벨
-		forbiddenFileLabel.setBounds(forbiddenFileLabel.getX(), 305 + topToAdd, forbiddenFileLabel.getWidth(), forbiddenFileLabel.getHeight());
+		topToAdd += 30;
+		forbiddenFileLabel.setBounds(forbiddenFileLabel.getX(), topToAdd, forbiddenFileLabel.getWidth(), forbiddenFileLabel.getHeight());
 		
 		// 복사금지 인풋박스
-		forbiddenFileText.setBounds(forbiddenFileText.getX(), 330 + topToAdd, newWidth, forbiddenFileText.getHeight());
+		topToAdd += 25;
+		forbiddenFileText.setBounds(forbiddenFileText.getX(), topToAdd, newWidth, forbiddenFileText.getHeight());
 		
-		// 결과폴더 라벨
-		destDirLabel.setBounds(destDirLabel.getX(), 355 + topToAdd, destDirLabel.getWidth(), destDirLabel.getHeight());
+		// 결과 폴더 라벨
+		topToAdd += 25;
+		destDirLabel.setBounds(destDirLabel.getX(), topToAdd, destDirLabel.getWidth(), destDirLabel.getHeight());
 		
-		// 결과폴더 인풋박스
-		destDirText.setBounds(destDirText.getX(), 380 + topToAdd, newWidth - destDirButtonGap, destDirText.getHeight());
+		// 결과 폴더 인풋박스
+		topToAdd += 25;
+		destDirText.setBounds(destDirText.getX(), topToAdd, newWidth - destDirButtonGap, destDirText.getHeight());
 		
-		// 결과폴더 열기버튼
-		destDirButton.setBounds(destDirText.getX() + (newWidth - destDirButtonGap) + 10, 380 + topToAdd, destDirButtonWidth, destDirButtonHeight);
+		// 결과 폴더 열기버튼
+		destDirButton.setBounds(destDirText.getX() + (newWidth - destDirButtonGap) + 10, topToAdd, destDirButtonWidth, destDirButtonHeight);
 		
 		// 카피 버튼
-		copyButton.setBounds(copyButton.getX(), 420 + topToAdd, newWidth, copyButton.getHeight());
+		topToAdd += 40;
+		copyButton.setBounds(copyButton.getX(), topToAdd, newWidth, copyButton.getHeight());
 	}
 	
 	

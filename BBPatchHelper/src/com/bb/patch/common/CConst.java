@@ -10,7 +10,7 @@ import com.bb.patch.string.StringUtil;
 public class CConst {
 	
 	// 프로그램 버전
-	public static String version = "200717";
+	public static String version = "210107";
 	
 	private static final StringMap optionPropFile = new PropFileController().readPropFile("option.properties");
 	public static String getOption(String keyText, String defaultStr) {
@@ -27,6 +27,9 @@ public class CConst {
 	public static String classDir = getOption("CLASS_DIR", "");
 	
 	public static boolean bJavaToClass = getOption("JAVA_TO_CLASS", "1").equals("1");
+	
+	// webapp 경로 포함된 경우만 가져오기
+	public static boolean bGetWebappDirOnly = false;
 	
 	public static String forbiddenFile = getOption("FORBIDDEN_FILE", "*.xml, *.conf, *.config, *.properties");
 	
@@ -54,7 +57,7 @@ public class CConst {
 	public static Color buttonTextColor = new Color(0, 0, 0);
 
 	public static int winWidth = 600;
-	public static int winHeight = 520;
+	public static int winHeight = 540;
 	
 	public static int errLogWidth = 600;
 	public static int errLogHeight = 520;
@@ -64,7 +67,7 @@ public class CConst {
 	
 	// 171029 (원주 가기 전날 토요일)
 	// 1. 버튼 색깔 다시 되돌림 (하늘색 -> 노란색)
-	// 2. 결과폴더 날짜에 따라 자동생성 되도록 수정.
+	// 2. 결과 폴더 날짜에 따라 자동생성 되도록 수정.
 	// 3. AUTO 버튼에 중복제거 기능 추가.
 	
 	

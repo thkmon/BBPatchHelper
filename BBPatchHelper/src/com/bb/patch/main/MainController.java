@@ -515,15 +515,17 @@ public class MainController {
 					continue;
 				}
 
+				String oneCorePath = "/" + PathUtil.makeEndPath(oneInputPath);
+				
+				// 복사금지 패턴
 				if (matchPatternList(oneInputPath, forbiddenFilePatternList)) {
-					printLog("복사 금지 패턴 : " + oneInputPath);
+					printLog("복사금지 패턴 : " + oneInputPath);
 					
-					String oneCorePath = "/" + PathUtil.makeEndPath(oneInputPath);
 					resultforbiddenPathListToPrint.add(oneCorePath);
 					continue;
 				}
 
-				if (!fileCtrl.copyAndPasteFile(realClassFolderPath, bDirCopyMode, oneInputPath, resultFilePathListToPrint, resultCorePathListToPrint)) {
+				if (!fileCtrl.copyAndPasteFile(realClassFolderPath, bDirCopyMode, oneInputPath, resultFilePathListToPrint, resultCorePathListToPrint, resultforbiddenPathListToPrint)) {
 					printErrLog("실패! " + oneInputPath);
 				}
 			}
@@ -554,6 +556,7 @@ public class MainController {
 	private void printResultPaths(UniqueStringList resultFilePathListToPrint, UniqueStringList resultCorePathListToPrint, UniqueStringList resultforbiddenPathListToPrint) {
 		int pathCount = 0;
 		
+		/*
 		// 절대경로 출력
 		if (resultFilePathListToPrint != null && resultFilePathListToPrint.size() > 0) {
 			printLog("==================================================");
@@ -568,7 +571,7 @@ public class MainController {
 			}
 			printLog("==================================================");
 		}
-		
+		*/
 		
 		// filelist.txt 파일 쓰기
 		String destDirPath = PatchForm.destDirText.getText();
@@ -609,7 +612,8 @@ public class MainController {
 						printLog("");
 						filelistBuffer.append("\n");
 						
-						String countText2 = "복사금지 패턴에 해당하는 파일 : " + forbiddenFileCount + "개";
+						// String countText2 = "복사금지 패턴에 해당하는 파일 : " + forbiddenFileCount + "개";
+						String countText2 = "복사 제외된 파일 : " + forbiddenFileCount + "개";
 						printLog(countText2);
 						filelistBuffer.append("\n" + countText2);
 						
@@ -625,6 +629,9 @@ public class MainController {
 				}
 			}
 		}
+		
+		printLog("결과 폴더 : " + destDirPath);
+		printLog("==================================================");
 	}
 	
 

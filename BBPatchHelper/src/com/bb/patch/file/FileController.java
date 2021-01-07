@@ -27,7 +27,7 @@ public class FileController {
 	}
 	
 
-	public boolean copyAndPasteFile(String realClassFolderPath, boolean bDirCopyMode, String path, UniqueStringList resultFilePathListToPrint, UniqueStringList resultCorePathListToPrint) throws Exception {
+	public boolean copyAndPasteFile(String realClassFolderPath, boolean bDirCopyMode, String path, UniqueStringList resultFilePathListToPrint, UniqueStringList resultCorePathListToPrint, UniqueStringList resultforbiddenPathListToPrint) throws Exception {
 		if (path == null || path.trim().length() == 0) {
 			printErrLog("파일 경로가 없습니다.");
 			return false;
@@ -37,6 +37,10 @@ public class FileController {
 		path = escapePath(path);
 		
 		try {
+			// webapp 경로 포함된 경우만 가져오기
+			boolean bCheckedGetWebappDirOnly = PatchForm.getWebappDirOnlyCheckBox.isSelected();
+			String webappDirText = "/webapp/";
+			String webappDirText2 = "\\webapp\\";
 			
 			File originFile = new File(path);
 			
@@ -94,6 +98,18 @@ public class FileController {
 			
 			printLog("수정시간 : " + getFileModifyDateTime(originFile));
 			printLog("파일 복제 결과경로 : " + resultPath);
+			
+			// webapp 경로 포함된 경우만 가져오기
+			if (bCheckedGetWebappDirOnly) {
+				if (resultPath.indexOf(webappDirText) < 0 && resultPath.indexOf(webappDirText2) < 0) {
+					printLog("webapp 경로 포함되지 않았으므로 제외 : " + resultPath);
+					
+					resultforbiddenPathListToPrint.add(corePath1);
+					printLog("==================================================");
+					return true;
+				}
+			}
+			
 			
 			if (originFile.exists()) {
 				boolean copySuccess = true;
