@@ -82,7 +82,7 @@ public class PatchForm {
 		int width = 560;
 		int left = 10;
 		
-		// 대상폴더
+		// 대상 폴더
 		bForm.addLabel(left, top, width, 30, "대상 폴더 (비워도 됨)");
 		plusTop(1);
 		targetFolderText = bForm.addTextInput(left, top, 560, 25);
@@ -90,7 +90,7 @@ public class PatchForm {
 		
 		plusTop(1);
 		
-		// 클래스폴더
+		// 클래스 폴더
 		bForm.addLabel(left, top, width, 30, "클래스 폴더");
 		plusTop(1);
 		classFolderText = bForm.addTextInput(left, top, 560, 25);
@@ -98,7 +98,7 @@ public class PatchForm {
 		
 		plusTop(1);
 		
-		// 대상파일
+		// 대상 파일
 		bForm.addLabel(left, top, width, 30, "대상 파일");
 		
 		// 보정버튼(REVISE)
@@ -125,7 +125,7 @@ public class PatchForm {
 		// 우측정렬
 		lineLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		
-		// 대상파일 TextArea
+		// 대상 파일 TextArea
 		plusTop(1);
 		targetPathList = bForm.addTextArea(left, top, width, 170);
 		targetPathScrollPane = bForm.addScrollPane(targetPathList, left, top, width, 170);
@@ -279,16 +279,16 @@ public class PatchForm {
 		
 		int newWidth = formWidth - 40;
 		
-		// 대상폴더 인풋박스
+		// 대상 폴더 인풋박스
 		targetFolderText.setSize(newWidth, targetFolderText.getHeight());
 		
-		// 클래스폴더 인풋박스
+		// 클래스 폴더 인풋박스
 		classFolderText.setSize(newWidth, classFolderText.getHeight());
 		
 		// 라인현황 레이블
 		lineLabel.setBounds(formWidth - 235, lineLabel.getY(), lineLabel.getWidth(), lineLabel.getHeight());
 		
-		// 대상파일 텍스트영역 2
+		// 대상 파일 텍스트영역 2
 		try {
 			int newHeight = 155;
 			newHeight = newHeight + topToAdd;
@@ -297,7 +297,7 @@ public class PatchForm {
 				newHeight = 155;
 			}
 						
-			// 대상파일 텍스트영역 1
+			// 대상 파일 텍스트영역 1
 			targetPathList.setSize(newWidth, newHeight);
 			targetPathScrollPane.setSize(newWidth, newHeight);
 			
