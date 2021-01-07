@@ -15,6 +15,7 @@ import java.util.Calendar;
 import com.bb.patch.file.data.UniqueStringList;
 import com.bb.patch.form.PatchForm;
 import com.bb.patch.main.MainController;
+import com.bb.patch.string.PathUtil;
 import com.bb.patch.string.StringUtil;
 
 public class FileController {
@@ -65,7 +66,7 @@ public class FileController {
 			}
 			
 			String endPath = path;
-			endPath = StringUtil.makeEndPath(endPath);
+			endPath = PathUtil.makeEndPath(endPath);
 			
 			String destDirPath = PatchForm.destDirText.getText();
 			if (destDirPath == null || destDirPath.length() == 0) {
@@ -160,7 +161,7 @@ public class FileController {
 									printLog("이너클래스 추가 : " + StringUtil.makeToSlashPath(innerClassFile.getAbsolutePath()));
 									
 									String endPath2 = innerClassFile.getAbsolutePath();
-									endPath2 = StringUtil.makeEndPath(endPath2);
+									endPath2 = PathUtil.makeEndPath(endPath2);
 									
 									// currentDir = new File("");
 									// currentDirPath = currentDir.getAbsolutePath().replace("\\", "/");
@@ -420,7 +421,7 @@ public class FileController {
 			// 200306 공통 클래스 패스가 없을 경우, 다시 말해 [대상 폴더 (비워도 됨)] 인풋박스가 실제 비워져 있을 경우, 개별 java 파일마다 각각의 class 패스를 찾아온다.
 			if (classFolderText.length() == 0) {
 				if (originPath != null && originPath.indexOf(":") > -1) {
-					int slashIdx = StringUtil.getIndexOfWorkspaceFolderSlash(originPath);
+					int slashIdx = PathUtil.getIndexOfWorkspaceFolderSlash(originPath);
 					if (slashIdx > -1) {
 						String oneWorkspacePath = originPath.substring(0, slashIdx);
 						String oneClassDirPath = this.mainCtrl.getRealClassFolderPathByDotClasspathFile(oneWorkspacePath);

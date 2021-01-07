@@ -48,6 +48,7 @@ public class MainController {
 		return path;
 	}
 
+	
 	/**
 	 * 스트링 리스트에서 의미있는 파일 경로만 골라내서 담는다. 중복 제거.
 	 * 
@@ -131,12 +132,12 @@ public class MainController {
 	// REVISE 버튼 클릭시 수행
 	public void reviseButtonClicked() {
 
-		// 대상파일 인풋박스 보정
+		// 대상 파일 인풋박스 보정
 		String targetFolderText = PatchForm.targetFolderText.getText();
 		if (targetFolderText != null && targetFolderText.length() > 0) {
 			targetFolderText = revisePath(targetFolderText);
 
-			int slashIdx = StringUtil.getIndexOfWorkspaceFolderSlash(targetFolderText);
+			int slashIdx = PathUtil.getIndexOfWorkspaceFolderSlash(targetFolderText);
 			if (slashIdx > -1) {
 				targetFolderText = targetFolderText.substring(0, slashIdx);
 			}
@@ -199,7 +200,7 @@ public class MainController {
 			}
 
 			oneInput = revisePath(oneInput);
-			int slashIdx = StringUtil.getIndexOfWorkspaceFolderSlash(oneInput);
+			int slashIdx = PathUtil.getIndexOfWorkspaceFolderSlash(oneInput);
 
 			// 타겟 폴더 내용이 없다면, 타겟 패스 활용하여 채워준다.
 			if (PatchForm.targetFolderText.getText() == null || PatchForm.targetFolderText.getText().length() == 0) {
@@ -494,12 +495,12 @@ public class MainController {
 			// 파일 복사에 성공하면 결과경로를 출력한다.
 			UniqueStringList resultFilePathListToPrint = new UniqueStringList();
 			UniqueStringList resultCorePathListToPrint = new UniqueStringList();
+			UniqueStringList resultforbiddenPathListToPrint = new UniqueStringList();
 
 			String oneInputPath = "";
 
 			for (int i = 0; i < count; i++) {
 				printLog((i + 1) + "/" + count);
-				// oneInputPath = inputList[i];
 				oneInputPath = inputList.get(i);
 
 				if (oneInputPath == null || oneInputPath.trim().length() == 0) {
@@ -516,6 +517,9 @@ public class MainController {
 
 				if (matchPatternList(oneInputPath, forbiddenFilePatternList)) {
 					printLog("복사 금지 패턴 : " + oneInputPath);
+					
+					String oneCorePath = "/" + PathUtil.makeEndPath(oneInputPath);
+					resultforbiddenPathListToPrint.add(oneCorePath);
 					continue;
 				}
 
@@ -525,7 +529,7 @@ public class MainController {
 			}
 
 			// 파일 복사에 성공하면 결과경로를 출력한다.
-			printResultPaths(resultFilePathListToPrint, resultCorePathListToPrint);
+			printResultPaths(resultFilePathListToPrint, resultCorePathListToPrint, resultforbiddenPathListToPrint);
 
 			if (logBuffer != null && logBuffer.length() > 0) {
 				AlterForm.open("결과." + "\r\n" + logBuffer.toString(), CConst.errLogWidth, CConst.errLogHeight);
@@ -539,20 +543,22 @@ public class MainController {
 		}
 	}
 
+
 	/**
 	 * 파일 복사에 성공하면 결과경로를 출력한다.
 	 * 
-	 * @param resultFilePathList
-	 * @param resultCorePathList
+	 * @param resultFilePathListToPrint
+	 * @param resultCorePathListToPrint
+	 * @param resultforbiddenPathListToPrint
 	 */
-	public void printResultPaths(UniqueStringList resultFilePathListToPrint, UniqueStringList resultCorePathListToPrint) {
+	private void printResultPaths(UniqueStringList resultFilePathListToPrint, UniqueStringList resultCorePathListToPrint, UniqueStringList resultforbiddenPathListToPrint) {
 		int pathCount = 0;
 		
 		// 절대경로 출력
 		if (resultFilePathListToPrint != null && resultFilePathListToPrint.size() > 0) {
 			printLog("==================================================");
 			pathCount = resultFilePathListToPrint.size();
-			printLog("총 파일 개수 : " + pathCount + "개");
+			printLog("파일 개수 : " + pathCount + "개");
 
 			// 스트링 정렬
 			Collections.sort(resultFilePathListToPrint);
@@ -563,25 +569,64 @@ public class MainController {
 			printLog("==================================================");
 		}
 		
-		// 상대경로 출력
-		if (resultCorePathListToPrint != null && resultCorePathListToPrint.size() > 0) {
-			printLog("==================================================");
-			int coreCount = resultCorePathListToPrint.size();
-			
-			// 둘의 카운트가 같은게 정상이다. 혹시 모르니 다를 경우 개수를 출력한다.
-			if (pathCount != coreCount) {
-				printLog("총 파일 개수 : " + coreCount + "개");
-			}
+		
+		// filelist.txt 파일 쓰기
+		String destDirPath = PatchForm.destDirText.getText();
+		if (destDirPath != null && destDirPath.length() > 0) {
+			// destDirPath = "C:\\patch_result";
+			File destDir = new File(destDirPath);
+			if (destDir.exists()) {
+				File destFile = new File(destDirPath + File.separator + "filelist.txt");
+				if (destFile.exists()) {
+					destFile.delete();
+				}
+				
+				// 상대경로 출력
+				StringBuffer filelistBuffer = new StringBuffer();
+				if (resultCorePathListToPrint != null && resultCorePathListToPrint.size() > 0) {
+					printLog("==================================================");
+					printLog(destFile.getAbsolutePath());
+					printLog("");
+					
+					int coreCount = resultCorePathListToPrint.size();
+					
+					String countText = "파일 개수 : " + coreCount + "개";
+					printLog(countText);
+					filelistBuffer.append(countText);
+					
+					// 스트링 정렬
+					Collections.sort(resultCorePathListToPrint);
 
-			// 스트링 정렬
-			Collections.sort(resultCorePathListToPrint);
-
-			for (int i = 0; i < coreCount; i++) {
-				printLog(resultCorePathListToPrint.get(i));
+					for (int i = 0; i < coreCount; i++) {
+						printLog(resultCorePathListToPrint.get(i));
+						filelistBuffer.append("\n" + resultCorePathListToPrint.get(i));
+					}
+					
+					if (resultforbiddenPathListToPrint != null && resultforbiddenPathListToPrint.size() > 0) {
+						Collections.sort(resultforbiddenPathListToPrint);
+						
+						int forbiddenFileCount = resultforbiddenPathListToPrint.size();
+						printLog("");
+						filelistBuffer.append("\n");
+						
+						String countText2 = "복사금지 패턴에 해당하는 파일 : " + forbiddenFileCount + "개";
+						printLog(countText2);
+						filelistBuffer.append("\n" + countText2);
+						
+						for (int i = 0; i < forbiddenFileCount; i++) {
+							printLog(resultforbiddenPathListToPrint.get(i));
+							filelistBuffer.append("\n" + resultforbiddenPathListToPrint.get(i));
+						}
+					}
+					
+					printLog("==================================================");
+					
+					FileController.writeFile(destFile, filelistBuffer);
+				}
 			}
-			printLog("==================================================");
 		}
 	}
+	
 
 	public StringList makeForbiddenFilePatternList() throws MsgException, Exception {
 
@@ -802,7 +847,7 @@ public class MainController {
 			return "";
 		}
 		
-		// 대상파일 인풋박스 내용
+		// 대상 파일 인풋박스 내용
 		String targetFolderText = StringUtil.parseStirng(PatchForm.targetFolderText.getText());
 		String inputClassPath = StringUtil.parseStirng(PatchForm.classFolderText.getText()).trim();
 		
@@ -817,10 +862,10 @@ public class MainController {
 			}
 		}
 		
-		// 2. 계속해서 인풋박스에 입력해둔 클래스 패스가 유효한지 검사한다. (예 : 대상파일 +/classes)
+		// 2. 계속해서 인풋박스에 입력해둔 클래스 패스가 유효한지 검사한다. (예 : 대상 파일 +/classes)
 		if (targetFolderText.length() > 0) {
 			if (inputClassPath.length() > 0) {
-				// 대상파일 인풋박스 내용
+				// 대상 파일 인풋박스 내용
 				String firstClassPath = PathUtil.revisePath(targetFolderText + "/" + inputClassPath);
 				File firstClassDir = new File(firstClassPath);
 				if (firstClassDir.exists() && firstClassDir.isDirectory()) {
@@ -907,7 +952,7 @@ public class MainController {
 			}
 			
 			if (parsedClassPath != null && parsedClassPath.length() > 0) {
-				// 대상파일 인풋박스 내용
+				// 대상 파일 인풋박스 내용
 				String secondClassPath = PathUtil.revisePath(targetFolderText + "/" + parsedClassPath);
 				File secondClassDir = new File(secondClassPath);
 				if (secondClassDir.exists() && secondClassDir.isDirectory()) {

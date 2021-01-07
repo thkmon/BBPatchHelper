@@ -111,4 +111,79 @@ public class PathUtil {
 		
 		return path.trim();
 	}
+	
+	
+	public static String makeEndPath(String path) {
+		
+		path = StringUtil.makeToSlashPath(path);
+		
+		int slashIdx = getIndexOfWorkspaceFolderSlash(path);
+		if (slashIdx > -1) {
+			path = path.substring(slashIdx + 1);
+		}
+		
+		if (StringUtil.indexOfIgnoreCase(path, "c:/") > -1) {
+			path = StringUtil.replaceIgnoreCase(path, "c:/", "");
+		}
+		
+		if (path.indexOf(":") > -1) {
+			// 경로에 콜론이 존재할 경우 제거
+			path = path.replace(":", "");
+		}
+		
+		return path;
+	}
+
+
+	public static int getIndexOfWorkspaceFolderSlash(String path) {
+		
+		path = StringUtil.makeToSlashPath(path);
+		
+		int folderIdx = StringUtil.indexOfIgnoreCase(path, "/workspaces/");
+		if (folderIdx > -1) {
+			int newIndex = path.indexOf("/", folderIdx + 12);
+			if (newIndex > -1) {
+				int resultIndex = path.indexOf("/", newIndex + 1);
+				if (resultIndex > -1) {
+					return resultIndex;
+				}
+			}
+			
+		}
+		
+		folderIdx = StringUtil.indexOfIgnoreCase(path, "/workspace/");
+		if (folderIdx > -1) {
+			int newIndex = path.indexOf("/", folderIdx + 11);
+			if (newIndex > -1) {
+				int resultIndex = path.indexOf("/", newIndex + 1);
+				if (resultIndex > -1) {
+					return resultIndex;
+				}
+			}
+		}
+		
+		folderIdx = StringUtil.indexOfIgnoreCase(path, "/gits/");
+		if (folderIdx > -1) {
+			int newIndex = path.indexOf("/", folderIdx + 6);
+			if (newIndex > -1) {
+				int resultIndex = path.indexOf("/", newIndex + 1);
+				if (resultIndex > -1) {
+					return resultIndex;
+				}
+			}
+		}
+		
+		folderIdx = StringUtil.indexOfIgnoreCase(path, "/git/");
+		if (folderIdx > -1) {
+			int newIndex = path.indexOf("/", folderIdx + 5);
+			if (newIndex > -1) {
+				int resultIndex = path.indexOf("/", newIndex + 1);
+				if (resultIndex > -1) {
+					return resultIndex;
+				}
+			}
+		}
+		
+		return -1;
+	}
 }
