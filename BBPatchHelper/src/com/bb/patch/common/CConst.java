@@ -32,6 +32,7 @@ public class CConst {
 	public static boolean bGetWebappDirOnly = false;
 	
 	public static String forbiddenFile = getOption("FORBIDDEN_FILE", "*.xml, *.conf, *.config, *.properties");
+	public static String allowFile = getOption("ALLOW_FILE", "*");
 	
 	public static String destDir = getOption("RESULT_DIR", "C:/0_patch");
 	
@@ -57,10 +58,10 @@ public class CConst {
 	public static Color buttonTextColor = new Color(0, 0, 0);
 
 	public static int winWidth = 600;
-	public static int winHeight = 540;
+	public static int winHeight = 600;
 	
 	public static int errLogWidth = 600;
-	public static int errLogHeight = 520;
+	public static int errLogHeight = 600;
 	
 	public static Color formBackgroundColor = new Color(230, 230, 230);
 	

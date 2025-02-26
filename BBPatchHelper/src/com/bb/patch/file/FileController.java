@@ -27,7 +27,7 @@ public class FileController {
 	}
 	
 
-	public boolean copyAndPasteFile(String realClassFolderPath, boolean bDirCopyMode, String path, UniqueStringList resultFilePathListToPrint, UniqueStringList resultCorePathListToPrint, UniqueStringList resultforbiddenPathListToPrint) throws Exception {
+	public boolean copyAndPasteFile(String realClassFolderPath, boolean bDirCopyMode, String path, UniqueStringList resultFilePathListToPrint, UniqueStringList resultCorePathListToPrint, UniqueStringList resultForbiddenPathListToPrint) throws Exception {
 		if (path == null || path.trim().length() == 0) {
 			printErrLog("파일 경로가 없습니다.");
 			return false;
@@ -104,7 +104,7 @@ public class FileController {
 				if (resultPath.indexOf(webappDirText) < 0 && resultPath.indexOf(webappDirText2) < 0) {
 					printLog("webapp 경로 포함되지 않았으므로 제외 : " + resultPath);
 					
-					resultforbiddenPathListToPrint.add(corePath1);
+					resultForbiddenPathListToPrint.add(corePath1);
 					printLog("==================================================");
 					return true;
 				}

@@ -410,6 +410,20 @@ public class MainController {
 			} catch (Exception e) {
 				throw e;
 			}
+			
+			// 복사허용 패턴
+			StringList allowFilePatternList = null;
+
+			try {
+				allowFilePatternList = makeAllowFilePatternList();
+
+			} catch (MsgException e) {
+				AlterForm.open(e.getMessage());
+				return;
+
+			} catch (Exception e) {
+				throw e;
+			}
 
 			// 대상 폴더
 			String targetFolderText = PatchForm.targetFolderText.getText();
@@ -495,7 +509,7 @@ public class MainController {
 			// 파일 복사에 성공하면 결과경로를 출력한다.
 			UniqueStringList resultFilePathListToPrint = new UniqueStringList();
 			UniqueStringList resultCorePathListToPrint = new UniqueStringList();
-			UniqueStringList resultforbiddenPathListToPrint = new UniqueStringList();
+			UniqueStringList resultForbiddenPathListToPrint = new UniqueStringList();
 
 			String oneInputPath = "";
 
@@ -518,20 +532,32 @@ public class MainController {
 				String oneCorePath = "/" + PathUtil.makeEndPath(oneInputPath);
 				
 				// 복사금지 패턴
-				if (matchPatternList(oneInputPath, forbiddenFilePatternList)) {
-					printLog("복사금지 패턴 : " + oneInputPath);
-					
-					resultforbiddenPathListToPrint.add(oneCorePath);
-					continue;
+				if (forbiddenFilePatternList != null) {
+					if (matchPatternList(oneInputPath, forbiddenFilePatternList)) {
+						printLog("복사금지 패턴 : " + oneInputPath);
+						
+						resultForbiddenPathListToPrint.add(oneCorePath);
+						continue;
+					}
 				}
-
-				if (!fileCtrl.copyAndPasteFile(realClassFolderPath, bDirCopyMode, oneInputPath, resultFilePathListToPrint, resultCorePathListToPrint, resultforbiddenPathListToPrint)) {
+				
+				// 복사허용 패턴
+				if (allowFilePatternList != null) {
+					if (!matchPatternList(oneInputPath, allowFilePatternList)) {
+						printLog("복사허용 패턴 불일치 : " + oneInputPath);
+						
+						resultForbiddenPathListToPrint.add(oneCorePath);
+						continue;
+					}
+				}
+				
+				if (!fileCtrl.copyAndPasteFile(realClassFolderPath, bDirCopyMode, oneInputPath, resultFilePathListToPrint, resultCorePathListToPrint, resultForbiddenPathListToPrint)) {
 					printErrLog("실패! " + oneInputPath);
 				}
 			}
 
 			// 파일 복사에 성공하면 결과경로를 출력한다.
-			printResultPaths(resultFilePathListToPrint, resultCorePathListToPrint, resultforbiddenPathListToPrint);
+			printResultPaths(resultFilePathListToPrint, resultCorePathListToPrint, resultForbiddenPathListToPrint);
 
 			if (logBuffer != null && logBuffer.length() > 0) {
 				AlterForm.open("결과." + "\r\n" + logBuffer.toString(), CConst.errLogWidth, CConst.errLogHeight);
@@ -553,7 +579,7 @@ public class MainController {
 	 * @param resultCorePathListToPrint
 	 * @param resultforbiddenPathListToPrint
 	 */
-	private void printResultPaths(UniqueStringList resultFilePathListToPrint, UniqueStringList resultCorePathListToPrint, UniqueStringList resultforbiddenPathListToPrint) {
+	private void printResultPaths(UniqueStringList resultFilePathListToPrint, UniqueStringList resultCorePathListToPrint, UniqueStringList resultForbiddenPathListToPrint) {
 		int pathCount = 0;
 		
 		/*
@@ -605,21 +631,21 @@ public class MainController {
 						filelistBuffer.append("\n" + resultCorePathListToPrint.get(i));
 					}
 					
-					if (resultforbiddenPathListToPrint != null && resultforbiddenPathListToPrint.size() > 0) {
-						Collections.sort(resultforbiddenPathListToPrint);
+					// 복사 제외된 파일(복사금지일치 또는 복사허용불일치)
+					if (resultForbiddenPathListToPrint != null && resultForbiddenPathListToPrint.size() > 0) {
+						Collections.sort(resultForbiddenPathListToPrint);
 						
-						int forbiddenFileCount = resultforbiddenPathListToPrint.size();
+						int forbiddenFileCount = resultForbiddenPathListToPrint.size();
 						printLog("");
 						filelistBuffer.append("\n");
 						
-						// String countText2 = "복사금지 패턴에 해당하는 파일 : " + forbiddenFileCount + "개";
 						String countText2 = "복사 제외된 파일 : " + forbiddenFileCount + "개";
 						printLog(countText2);
 						filelistBuffer.append("\n" + countText2);
 						
 						for (int i = 0; i < forbiddenFileCount; i++) {
-							printLog(resultforbiddenPathListToPrint.get(i));
-							filelistBuffer.append("\n" + resultforbiddenPathListToPrint.get(i));
+							printLog(resultForbiddenPathListToPrint.get(i));
+							filelistBuffer.append("\n" + resultForbiddenPathListToPrint.get(i));
 						}
 					}
 					
@@ -634,7 +660,13 @@ public class MainController {
 		printLog("==================================================");
 	}
 	
-
+	/**
+	 * 복사금지
+	 * 
+	 * @return
+	 * @throws MsgException
+	 * @throws Exception
+	 */
 	public StringList makeForbiddenFilePatternList() throws MsgException, Exception {
 
 		String extString = PatchForm.forbiddenFileText.getText();
@@ -660,6 +692,40 @@ public class MainController {
 		StringList extStringList = StringUtil.splitMulti(extString, ",", ";");
 		return extStringList;
 	}
+	
+	/**
+	 * 복사허용
+	 * 
+	 * @return
+	 * @throws MsgException
+	 * @throws Exception
+	 */
+	public StringList makeAllowFilePatternList() throws MsgException, Exception {
+
+		String extString = PatchForm.allowFileText.getText();
+
+		if (extString == null || extString.trim().length() == 0) {
+			return null;
+		}
+		
+		if ("*".equals(extString)) {
+			return null;
+		}
+
+		extString = extString.toLowerCase();
+		
+		if (extString.indexOf("<") > -1 || extString.indexOf(">") > -1) {
+			throw new MsgException("복사허용 패턴에 특수문자 '<' 또는 '>' 를 기입할 수 없습니다.");
+		}
+
+		if (extString.indexOf("[") > -1 || extString.indexOf("]") > -1) {
+			throw new MsgException("복사허용 패턴에 특수문자 '[' 또는 ']' 를 기입할 수 없습니다.");
+		}
+
+		StringList extStringList = StringUtil.splitMulti(extString, ",", ";");
+		return extStringList;
+	}
+	
 
 	public boolean matchPatternList(String str, StringList patternList) {
 		if (str == null || str.length() == 0) {

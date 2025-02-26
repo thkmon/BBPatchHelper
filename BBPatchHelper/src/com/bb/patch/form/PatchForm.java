@@ -49,6 +49,9 @@ public class PatchForm {
 	public static JLabel forbiddenFileLabel = null;
 	public static JTextField forbiddenFileText = null;
 	
+	public static JLabel allowFileLabel = null;
+	public static JTextField allowFileText = null;
+	
 	// 결과 폴더 라벨
 	public static JLabel destDirLabel = null;
 	
@@ -202,6 +205,15 @@ public class PatchForm {
 		forbiddenFileText.setText(CConst.forbiddenFile);
 		
 		plusTop(1);
+		
+		// 복사허용 패턴
+		allowFileLabel = bForm.addLabel(left, top, width, 30, "복사허용 패턴");
+		plusTop(1);
+		allowFileText = bForm.addTextInput(left, top, width, 25);
+		allowFileText.setText(CConst.allowFile);
+		
+		plusTop(1);
+		
 		// 결과 폴더 라벨
 		destDirLabel = bForm.addLabel(left, top, width, 30, "결과 폴더");
 		plusTopLittle(1);
@@ -328,6 +340,14 @@ public class PatchForm {
 		// 복사금지 인풋박스
 		topToAdd += 25;
 		forbiddenFileText.setBounds(forbiddenFileText.getX(), topToAdd, newWidth, forbiddenFileText.getHeight());
+		
+		// 복사허용 라벨
+		topToAdd += 30;
+		allowFileLabel.setBounds(allowFileLabel.getX(), topToAdd, allowFileLabel.getWidth(), allowFileLabel.getHeight());
+		
+		// 복사허용 인풋박스
+		topToAdd += 25;
+		allowFileText.setBounds(allowFileText.getX(), topToAdd, newWidth, allowFileText.getHeight());
 		
 		// 결과 폴더 라벨
 		topToAdd += 25;
