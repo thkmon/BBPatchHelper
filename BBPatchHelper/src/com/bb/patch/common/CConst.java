@@ -54,8 +54,9 @@ public class CConst {
 	// public static Color buttonTextColor = new Color(0, 0, 0);
 	
 	//	연노란색 (190320, 190325)
-	public static Color buttonColor = new Color(255, 255, 200);
-	public static Color buttonTextColor = new Color(0, 0, 0);
+	// FlatLaf를 사용하므로 기본 색상 사용 (null로 설정)
+	public static Color buttonColor = null;
+	public static Color buttonTextColor = null;
 
 	public static int winWidth = 600;
 	public static int winHeight = 600;
@@ -63,7 +64,8 @@ public class CConst {
 	public static int errLogWidth = 600;
 	public static int errLogHeight = 600;
 	
-	public static Color formBackgroundColor = new Color(230, 230, 230);
+	// FlatLaf를 사용하므로 기본 배경색 사용
+	public static Color formBackgroundColor = null;
 	
 	
 	// 171029 (원주 가기 전날 토요일)

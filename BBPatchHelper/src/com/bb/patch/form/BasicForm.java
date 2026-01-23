@@ -29,8 +29,10 @@ public class BasicForm extends JFrame {
 		setSize(width, height);
 		setBounds(200, 200, width, height);
 		
-		setBackground(CConst.formBackgroundColor);
-		container.setBackground(CConst.formBackgroundColor);
+		if (CConst.formBackgroundColor != null) {
+			setBackground(CConst.formBackgroundColor);
+			container.setBackground(CConst.formBackgroundColor);
+		}
 		
 		setTitle(title);		
 		font = new Font("굴림", 13, 13);
@@ -79,7 +81,6 @@ public class BasicForm extends JFrame {
 	
 	public JScrollPane addScrollPane(JTextArea obj, int left, int top, int width, int height) {
 		JScrollPane scrollPane = new JScrollPane(obj);
-		scrollPane.setBackground(Color.white);
 		scrollPane.setBounds(left, top, width, height);
 		
 		addComponentObj(scrollPane);
@@ -90,7 +91,6 @@ public class BasicForm extends JFrame {
 	public JTextArea addTextArea(int left, int top, int width, int height) {
 
 		JTextArea obj = new JTextArea();
-		obj.setBackground(Color.white);
 		obj.setBounds(left, top, width, height);
 		obj.setFont(font);
 		return obj;
@@ -99,7 +99,6 @@ public class BasicForm extends JFrame {
 	
 	public JTextField addTextInput(int left, int top, int width, int height) {
 		JTextField obj = new JTextField();
-		obj.setBackground(Color.white);
 		obj.setBounds(left, top, width, height);
 		obj.setFont(font);
 		
@@ -110,7 +109,6 @@ public class BasicForm extends JFrame {
 	
 	public JLabel addLabel(int left, int top, int width, int height, String value) {
 		JLabel obj = new JLabel();
-		obj.setBackground(Color.white);
 		obj.setBounds(left, top, width, height);
 		obj.setText(value);
 		obj.setFont(font);
@@ -133,11 +131,15 @@ public class BasicForm extends JFrame {
 	
 	public JButton addButton(int left, int top, int width, int height, String value) {
 		JButton obj = new JButton();
-		obj.setBackground(CConst.buttonColor);
+		if (CConst.buttonColor != null) {
+			obj.setBackground(CConst.buttonColor);
+		}
 		obj.setBounds(left, top, width, height);
 		obj.setText(value);
 		obj.setFont(font);
-		obj.setForeground(CConst.buttonTextColor);
+		if (CConst.buttonTextColor != null) {
+			obj.setForeground(CConst.buttonTextColor);
+		}
 		
 //		obj.addMouseMotionListener(new MouseMotionListener() {
 //			@Override
@@ -157,7 +159,9 @@ public class BasicForm extends JFrame {
 	
 	public JCheckBox addCheckBox(int left, int top, int width, int height, String value) {
 		JCheckBox checkBox = new JCheckBox();
-		checkBox.setBackground(CConst.formBackgroundColor);
+		if (CConst.formBackgroundColor != null) {
+			checkBox.setBackground(CConst.formBackgroundColor);
+		}
 		checkBox.setBounds(left, top, width, height);
 		checkBox.setText(value);
 		checkBox.setFont(font);
