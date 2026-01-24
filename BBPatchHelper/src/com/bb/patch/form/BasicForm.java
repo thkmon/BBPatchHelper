@@ -35,7 +35,7 @@ public class BasicForm extends JFrame {
 		}
 		
 		setTitle(title);		
-		font = new Font("굴림", 13, 13);
+		font = new Font("Malgun Gothic", Font.PLAIN, 13);
 		
 //		this.addWindowListener(new WindowAdapter() {
 //			public void windowClosing(WindowEvent e) {
