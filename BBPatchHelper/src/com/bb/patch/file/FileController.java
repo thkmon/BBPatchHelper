@@ -514,8 +514,6 @@ public class FileController {
 				return originPath;
 			}
 			
-			// package com.nanum.smart.memo.bean;
-			
 		} catch (Exception e) {
 			return originPath;
 		} finally {

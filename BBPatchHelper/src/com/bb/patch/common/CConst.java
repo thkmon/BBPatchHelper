@@ -20,8 +20,8 @@ public class CConst {
 		return StringUtil.parseStirng(optionPropFile.get(keyText), defaultStr);
 	}
 	
-	// targetDir == "C:\\NANUM\\workspaces\\SmartFlowOSEWork\\SmartFlowOSE3.6WORK";
-	// targetDir == "C:\\NANUM\\workspaces\\프로젝트명\\폴더명\\";
+	// targetDir == "D:\eGovFrameDev-4.2.0-64bit\workspace\DMW\DMW";
+	// targetDir == "D:\eGovFrameDev-4.2.0-64bit\workspace\프로젝트명\폴더명";
 	public static String targetDir = getOption("TARGET_DIR", "");
 	
 	public static String classDir = getOption("CLASS_DIR", "");
