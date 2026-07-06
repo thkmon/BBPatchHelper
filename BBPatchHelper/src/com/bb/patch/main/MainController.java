@@ -295,6 +295,23 @@ public class MainController {
 						}
 					}
 				}
+			} else {
+				// 만약 /turnk/가 존재한다면, /trunk/[프로젝트명]/ 으로 판단, 프로젝트명 끝나는 부분의 슬래시부터 시작하도록 자른다.
+				int trunkIndex = oneInput.indexOf("/trunk/");
+				if (trunkIndex > -1) {
+					int slash1Index = oneInput.indexOf("/", trunkIndex + 1);
+					int slash2Index = oneInput.indexOf("/", slash1Index + 1);
+					if (slash1Index > -1 && slash2Index > -1) {
+						oneInput = oneInput.substring(slash2Index);
+					}
+				} else {
+					// 이도저도 아니면 두번째 슬래시부터 시작하도록 자른다.
+					int slash1Index = oneInput.indexOf("/");
+					int slash2Index = oneInput.indexOf("/", slash1Index + 1);
+					if (slash1Index > -1 && slash2Index > -1) {
+						oneInput = oneInput.substring(slash2Index);
+					}
+				}
 			}
 
 			oneInput = oneInput.trim();
