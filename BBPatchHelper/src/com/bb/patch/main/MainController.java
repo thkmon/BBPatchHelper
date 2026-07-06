@@ -304,13 +304,6 @@ public class MainController {
 					if (slash1Index > -1 && slash2Index > -1) {
 						oneInput = oneInput.substring(slash2Index);
 					}
-				} else {
-					// 이도저도 아니면 두번째 슬래시부터 시작하도록 자른다.
-					int slash1Index = oneInput.indexOf("/");
-					int slash2Index = oneInput.indexOf("/", slash1Index + 1);
-					if (slash1Index > -1 && slash2Index > -1) {
-						oneInput = oneInput.substring(slash2Index);
-					}
 				}
 			}
 
